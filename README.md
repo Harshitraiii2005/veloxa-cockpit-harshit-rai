@@ -7,10 +7,10 @@ Ananya Rao (CEO, Veloxa Technologies) asks one question and gets a short answer.
 ## One command
 
 ```bash
-./run.sh
+cp /path/to/Veloxa_Hackathon_Release_Packs.zip . && ./run.sh
 ```
 
-This needs Python 3.10 or later. The script creates `.venv`, installs `requirements.txt`, rebuilds `veloxa.db` from `Veloxa_Hackathon_Release_Packs/`, and then runs the cockpit.
+The release packs aren't committed, because they were sent as confidential (DECISIONS.md D-007). Copy in the zip from the hackathon email once. After that, `./run.sh` on its own is enough. This needs Python 3.10 or later. The script unzips the packs, creates `.venv`, installs `requirements.txt`, rebuilds `veloxa.db`, and then runs the cockpit.
 
 ## Running the test set
 
@@ -24,7 +24,7 @@ Today this runs the loader and point-in-time checks. The cockpit question set (2
 
 | Path | What |
 |---|---|
-| `Veloxa_Hackathon_Release_Packs/` | Raw material as received. Never edited. |
+| `Veloxa_Hackathon_Release_Packs/` | Raw material as received. Not committed (D-007); `run.sh` unzips it here. |
 | `cockpit/` | Loader, data model, cockpit, worry list, agents |
 | `curation/` | Hand-written judgements: aliases, transcript claims, resolutions |
 | `tests/` | Test questions with expected answers |

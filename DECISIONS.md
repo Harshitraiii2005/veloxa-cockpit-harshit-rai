@@ -32,5 +32,7 @@ These are choices I could defend either way. Each entry says what I picked, the 
 - **Survey comments for small teams.** The cockpit will not try to reconstruct them.
 - **Anything outside the data room.** It answers "I don't know" and names the record that would settle it.
 
-## D-007 · Raw data in the repo (16 Nov, pending)
-**Open:** whether the release packs are committed to the public repo. The fresh-clone run needs them, but the material was sent as confidential.
+## D-007 · Raw data stays out of the public repo (16 Nov)
+**Picked:** `Veloxa_Hackathon_Release_Packs/` is git-ignored. `run.sh` unzips `Veloxa_Hackathon_Release_Packs.zip` if it is in the repo root, and stops with a clear message if neither the folder nor the zip is there.
+**Alternative:** commit the packs, so a fresh clone runs with no extra step.
+**Why:** The material was sent as confidential, and the rules say not to share it with other candidates. A public repo would do exactly that. Graders already have the zip, so the cost is copying one file.
