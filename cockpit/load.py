@@ -67,11 +67,12 @@ def table_records(sid, rows, sheet=""):
         yield f"{sid}:title", f"{sheet}!{rows[0][0]}", None, str(rows[0][1][0]), None
         rows = rows[1:]
     (_, header), body = rows[0], rows[1:]
-    firsts = [r[0] for _, r in body]
-    unique = len(set(firsts)) == len(firsts)
+    # Key = first column whose values are all present and unique (Emp ID, Voucher, Key, sha), else row number.
+    cols = list(zip(*(r for _, r in body)))
+    key_col = next((i for i, c in enumerate(cols) if None not in c and len(set(c)) == len(c)), None)
     for n, r in body:
         data = {h: plain(v) for h, v in zip(header, r) if h is not None}
-        key = r[0] if unique else f"r{n}"
+        key = plain(r[key_col]) if key_col is not None else f"r{n}"
         yield f"{sid}:{key}", f"{sheet}!{n}", first_date(r), as_line(data), data
 
 
@@ -190,6 +191,10 @@ def build():
 
     load_curated(conn, "entities.csv", "entity", ("id", "kind", "name", "record_id"))
     load_curated(conn, "aliases.csv", "alias", ("alias", "entity_id", "confidence", "record_id", "note"))
+    load_curated(conn, "claims.csv", "claim", ("id", "metric", "value", "unit", "as_at", "record_id", "quote"))
+    load_curated(conn, "verdicts.csv", "verdict", ("claim_id", "verdict", "reason", "decided_on"))
+    # verdicts.csv holds a plain date; it takes effect at that day's 10:00 IST release (A-001).
+    conn.execute("UPDATE verdict SET decided_on = decided_on || 'T10:00:00+05:30'")
     conn.commit()
     return conn
 

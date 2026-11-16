@@ -1,7 +1,8 @@
 """Loader + point-in-time gate. Run: python -m unittest discover tests -v"""
+import re
 import unittest
 
-from cockpit.db import connect
+from cockpit.db import ROOT, connect
 from cockpit.load import build
 
 
@@ -25,6 +26,12 @@ class PointInTime(unittest.TestCase):
     def test_entities_follow_their_evidence(self):
         self.assertEqual(connect("2026-11-15").execute("SELECT COUNT(*) FROM v_entity").fetchone()[0], 0)
         self.assertEqual(connect("2026-11-16").execute("SELECT COUNT(*) FROM v_entity WHERE kind='person'").fetchone()[0], 19)
+
+    def test_record_ids_cited_in_docs_exist(self):
+        ids = {r[0] for r in connect("2026-12-31").execute("SELECT id FROM v_record")}
+        for doc in ROOT.glob("*.md"):
+            for cited in re.findall(r"`([A-Z][A-Za-z_-]*:[\w#.-]+|EML-\d+|BOARD-[A-Z]+)`", doc.read_text()):
+                self.assertTrue(cited in ids, f"{doc.name} cites {cited}, which is not a record")
 
     def test_payroll_is_restricted(self):
         rows = connect("2026-11-16").execute("SELECT DISTINCT source_id FROM v_record WHERE restricted = 1").fetchall()

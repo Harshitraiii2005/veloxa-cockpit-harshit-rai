@@ -40,6 +40,21 @@ CREATE TABLE alias (
   record_id TEXT NOT NULL REFERENCES record(id),  -- where this spelling was seen
   note TEXT
 );
+CREATE TABLE claim (            -- a number or fact a source states, copied as stated (curation/claims.csv)
+  id TEXT PRIMARY KEY,
+  metric TEXT NOT NULL,         -- arr | burn_monthly | customers | runway | team | atlas_ga
+  value TEXT,                   -- blank when the source gives no usable value
+  unit TEXT,                    -- Cr | L | count | months | date | ? (unit not stated)
+  as_at TEXT,                   -- the date the value is true for, if the source says
+  record_id TEXT NOT NULL REFERENCES record(id),
+  quote TEXT NOT NULL
+);
+CREATE TABLE verdict (          -- my call on a claim that disagrees (curation/verdicts.csv)
+  claim_id TEXT NOT NULL REFERENCES claim(id),
+  verdict TEXT NOT NULL,        -- misheard | wrong | different-measure | accepted
+  reason TEXT NOT NULL,         -- points to a TRANSCRIPT_NOTES entry (TN-xx)
+  decided_on TEXT NOT NULL      -- release date of the newest evidence the verdict relies on
+);
 """
 
 
@@ -67,6 +82,10 @@ def connect(as_of=None):
         WHERE s.released_at <= (SELECT t FROM asof);
       CREATE TEMP VIEW v_entity AS SELECT * FROM entity WHERE record_id IN (SELECT id FROM v_record);
       CREATE TEMP VIEW v_alias  AS SELECT * FROM alias  WHERE record_id IN (SELECT id FROM v_record);
+      CREATE TEMP VIEW v_claim  AS
+        SELECT c.*, r.kind FROM claim c JOIN v_record r ON r.id = c.record_id;
+      CREATE TEMP VIEW v_verdict AS
+        SELECT * FROM verdict WHERE claim_id IN (SELECT id FROM v_claim) AND decided_on <= (SELECT t FROM asof);
     """)
     conn.execute("INSERT INTO asof VALUES (?)", (to_ist(as_of or datetime.now(IST), end_of_day=True),))
     return conn

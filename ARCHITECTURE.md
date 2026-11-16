@@ -18,13 +18,13 @@ Veloxa_Hackathon_Release_Packs/      raw material, never edited
 │ entity    people, contractors, vendors, projects (canonical IDs)                      │
 │ alias     every spelling seen  ->  entity  (+ confidence, evidence)                  │
 │ claim     subject / metric / period / value, pointing at a record                    │
-│ resolution  which claim I believe for a conflict  ->  TRANSCRIPT_NOTES entry          │
+│ verdict   my call on a claim that disagrees  ->  TRANSCRIPT_NOTES entry              │
 └──────────────────────────────────────────────────────────────────────────────────────┘
         ▲                         ▲
         │ curation/*.csv          │  every read goes through visible(as_of)
         │ (hand-written:          │
         │  aliases, transcript    ├── cockpit/answer.py   question -> handler -> Answer
-        │  claims, resolutions)   ├── cockpit/worry.py    ranked "what should I worry about"
+        │  claims, verdicts)      ├── cockpit/worry.py    ranked "what should I worry about"
         │                         ├── cockpit/agents.py   14 people, grounded + invented persona
         │                         └── cockpit/cli.py, web page (stdlib http.server)
                                   tests/  25+ questions with expected answers, one command
@@ -38,13 +38,13 @@ Veloxa_Hackathon_Release_Packs/      raw material, never edited
 - `released_at`: when the cockpit learned it. This drives "what did we know on date X?".
 - `occurred_at`: when it happened in the company (txn date, email date, ticket created). This drives "what was the GA date on 1 Sep?".
 
-Every query goes through one function, `visible(as_of)`, which keeps only records with `released_at <= as_of`. This is the only place point-in-time is enforced, so later material can't leak through a side door. A resolution only applies when every record it relies on is visible at that date.
+Every query goes through `connect(as_of)` in `cockpit/db.py`. It exposes temp views (`v_record`, `v_claim`, `v_verdict`, ...) that keep only rows whose record has `released_at <= as_of`. This is the only place point-in-time is enforced, so later material can't leak through a side door. A verdict only applies from its `decided_on` release date, so a call I make on Day 3 evidence never changes a Day 1 answer.
 
 **Reliability tiers** (default trust, not a verdict): system export > formal document (board update, invoice, letter) > email > call transcript > voice note. The brief says exports are better but quirky and transcripts are often misheard. A lower tier can still win a specific conflict. When it does, the reason is written down.
 
 **Entities and aliases.** People are keyed by Keka Emp ID (`VX007`). People who aren't in Keka (contractors, for example) get `EXT-*` IDs. Vendors get `VEN-*` and projects `PRJ-*`. Every spelling seen anywhere (`Pria`, `PN`, `pnair@users.noreply.github.com`, `Kartik`, `Joho books`) is an `alias` row with confidence and evidence. This is the provided Entity_Resolution worksheet in table form. I can export it back to the xlsx for the final session.
 
-**Claims and conflicts.** Numbers people state (ARR, burn, headcount, GA date, attrition) become `claim` rows. Exports are parsed in code. Transcript claims are written by hand in `curation/claims.csv`, because deciding what a garbled line "said" is a judgement I want visible in a diff. When two visible claims share subject + metric + period and their values differ, that is a **conflict**. If I've recorded a resolution, the cockpit answers with it and cites both sides. If I haven't, it says "the sources disagree".
+**Claims, conflicts and verdicts.** Numbers and dates that sources state (ARR, burn, headcount, GA date) are `claim` rows in `curation/claims.csv`. Each row is copied as stated, with the quote and the unit (`?` when no unit is given), so that what a garbled line "said" is visible in a diff. For each metric, the cockpit picks the **best** claim: the latest dated one, with the most trusted tier on a tie. Dated claims for different dates form a trend, not a conflict. A claim **conflicts** with the best one when it is undated or has no usable value, and its value differs by more than 10%. A conflicting claim is set aside only when I have written a `verdict` for it in `curation/verdicts.csv` (misheard, wrong, or a different measure), pointing at my reasoning in TRANSCRIPT_NOTES.md. Until then the cockpit says "the sources disagree". The code never decides who is right.
 
 ## Cockpit answers
 

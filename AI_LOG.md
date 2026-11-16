@@ -11,6 +11,7 @@ Tool: an AI coding assistant in VS Code. Entries are newest first.
 - All four day folders were sent up front, so AI skimmed every one on Day 1 to pick parsers for each file type (xlsx, csv, eml, pdf, docx). Hand-curated content (claims, aliases, notes) only uses a folder on or after its release day.
 
 **Where it was wrong / what I changed**
+- Its loader keyed spreadsheet rows on the first column whenever that column was unique, and otherwise fell back to row numbers. The GL's first column is the transaction date, which repeats, so every GL row was keyed by row number (GL:r5 and so on). Meanwhile the docs it wrote cited `GL:JV-0846` and `GL:PAY-APR`, which didn't exist. I changed the rule to "first column that is fully unique" (the voucher, for the GL) and added a test that every record ID cited in the .md files exists.
 - Its first ARCHITECTURE.md draft named a file that is only released on Day 3. I replaced it with a generic description, so the Day 1 commit doesn't rely on material that isn't released yet.
 
 **What I did not let it do**
