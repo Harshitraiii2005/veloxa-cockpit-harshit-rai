@@ -2,7 +2,7 @@
 
 Ananya Rao (CEO, Veloxa Technologies) asks one question and gets a short answer. Each answer cites the records it rests on, states a confidence level, and admits when the sources disagree or don't say. It is built for the Hiyaku Systems hackathon (16–20 Nov 2026), on top of the Veloxa release packs. Veloxa is a fictional company.
 
-**Status:** Day 1. Architecture is done, and the loader is in progress. See [ARCHITECTURE.md](ARCHITECTURE.md).
+**Status:** Day 1. Architecture is done, and the loader builds `veloxa.db` from all four folders with release-date gating. See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## One command
 
@@ -18,7 +18,7 @@ This needs Python 3.10 or later. The script creates `.venv`, installs `requireme
 ./run.sh test
 ```
 
-(The test set lands later this week; the target is 25+ questions, with at least 5 refusal or uncertainty cases.)
+Today this runs the loader and point-in-time checks. The cockpit question set (25+ questions, at least 5 refusal or uncertainty cases) is added later this week.
 
 ## Repo map
 

@@ -10,20 +10,20 @@ Status key: **open** (evidence collected, not yet decided) · **decided** · **r
 - T1: "roughly eighteen people ('one-eighty, give or take')"
 - Candidate brief: "a 180-person B2B SaaS company"
 - Employee_Master: 19 employee rows. The header says contractors are not in Keka.
-- Board Q2 (8 Jul) and Q3 (6 Oct): Team 19
+- `BOARD-APRJUN` (sent 8 Jul) and `BOARD-JULSEP` (sent 6 Oct): Team 19
 - Conclusion:
 
 ### TN-02 · ARR: "forty-two / forty-five crore" vs "forty-eight" vs 5.8 → 6.1 Cr · open
 - T1: "around forty-two crore, maybe forty-five now"
 - T2: "ARR at the start of the year was 'forty-eight'" (no unit; the year runs April to March)
-- Board Q2 (sent 8 Jul): ARR Rs. 5.8 Cr
-- Board Q3 (sent 6 Oct): ARR Rs. 6.1 Cr
+- Board Apr–Jun (sent 8 Jul): ARR Rs. 5.8 Cr
+- Board Jul–Sep (sent 6 Oct): ARR Rs. 6.1 Cr
 - Conclusion:
 
 ### TN-03 · Burn: "two point two" vs Rs. 46 L / 44 L · open
 - T1: burn "around two point two" (unit not stated)
 - T2: "two point two lakhs a month, sometimes two point five"
-- Board Q2: monthly burn Rs. 46 L. Board Q3: Rs. 44 L.
+- Board Apr–Jun: monthly burn Rs. 46 L. Board Jul–Sep: Rs. 44 L.
 - GL: payroll alone is Rs. 31.75 L every month, Apr to Sep (`GL:PAY-APR` … `GL:PAY-SEP`). The GL is "selected cost centres" only, so it can't give a full burn figure.
 - Conclusion:
 
@@ -55,23 +55,23 @@ Status key: **open** (evidence collected, not yet decided) · **decided** · **r
 
 ### TN-07 · Atlas timing: "by the festive season" vs 15 Sep GA · open
 - T1: v3 "promised to some customers by the festive season"
-- Board Q2: "on track for GA on 15 September"
-- Board Q3: "We moved GA … the engine itself is feature-complete". No new date given.
+- Board Apr–Jun: "on track for GA on 15 September"
+- Board Jul–Sep: "We moved GA … the engine itself is feature-complete". No new date given.
 - Conclusion:
 
 ### TN-08 · Fatima's wedding month and the Feb payroll · open
 - T2: Fatima "was out for her wedding, that month was messy"
-- `EML:01` (28 Feb): Karthik "Ran Feb payroll since Fatima is out. Used the Jan sheet and added the new joiner."
+- `EML-01` (28 Feb): Karthik "Ran Feb payroll since Fatima is out. Used the Jan sheet and added the new joiner."
 - Payroll register: Feb rows were processed by KS, and Jan/Mar rows by FS.
-- `KEKA:VX018`: Rahul joined 2026-02-03. Feb payroll shows him at 28 of 28 days payable, gross Rs. 1,10,000.
-- `EML:02`: Rahul says his first payslip "looks higher than what I expected for a partial month". `EML:03`: Fatima says "Will check and get back." There is no later record of the outcome.
+- `KEKA:VX018`: Rahul joined 2026-02-03. Feb payroll (`PAYROLL:r39`) shows him at 28 of 28 days payable, gross Rs. 1,10,000.
+- `EML-02`: Rahul says his first payslip "looks higher than what I expected for a partial month". `EML-03`: Fatima says "Will check and get back." There is no later record of the outcome.
 - Conclusion:
 
 ### TN-09 · "Two backend roles" · open
 - T2 mentions them in passing.
-- Board Q2: "We will add two backend engineers this quarter … Search is underway."
+- Board Apr–Jun: "We will add two backend engineers this quarter … Search is underway."
 - `GL:JV-0688` (30 Jun): Cohere Recruiting Partners, Rs. 1,77,000, "Search fee, 2 backend roles (50% advance)"
-- Board Q3: "Hiring is paused while we close the round."
+- Board Jul–Sep: "Hiring is paused while we close the round."
 - Conclusion:
 
 ### TN-10 · Marketing spend "fine" vs "Nikhil's numbers never match mine" · open

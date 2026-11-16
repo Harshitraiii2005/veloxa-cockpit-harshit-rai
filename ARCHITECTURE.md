@@ -32,7 +32,7 @@ Veloxa_Hackathon_Release_Packs/      raw material, never edited
 
 ## Data model
 
-**Sources and records.** Every file in the four day folders is a `source`. Each source has a `released_at` set from its folder: Day 1 = 16 Nov, Day 2 = 17 Nov, Day 3 = 18 Nov, Day 4 = 19 Nov, all at 10:00 IST. Each source is split into `record`s: one per spreadsheet row, email, transcript bullet or PDF document. A record ID is what the cockpit cites, so I keep it readable: `GL:JV-0846`, `KEKA:VX013`, `PAYROLL:r39`, `EML:08`, `T2:#4`, `BOARD-Q2`.
+**Sources and records.** Every file in the four day folders is a `source`. Each source has a `released_at` set from its folder: Day 1 = 16 Nov, Day 2 = 17 Nov, Day 3 = 18 Nov, Day 4 = 19 Nov, all at 10:00 IST. Each source is split into `record`s: one per spreadsheet row, email, transcript bullet or PDF document. A record ID is what the cockpit cites, so I keep it readable: `GL:JV-0846`, `KEKA:VX013`, `PAYROLL:r39`, `EML-08`, `T2:#4`, `BOARD-APRJUN`.
 
 **Two times on every record (bitemporal).**
 - `released_at`: when the cockpit learned it. This drives "what did we know on date X?".
