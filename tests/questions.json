@@ -1,0 +1,19 @@
+[
+  {"q": "What is our ARR?", "as_of": "2026-11-16", "status": "disagree", "contains": ["6.1 Cr"], "cites": ["BOARD-JULSEP", "T1:#3", "T2:#3"]},
+  {"q": "What's the monthly burn?", "as_of": "2026-11-16", "status": "disagree", "contains": ["44 L"], "cites": ["BOARD-JULSEP", "T2:#3"]},
+  {"q": "How many customers do we have?", "as_of": "2026-11-16", "status": "answered", "contains": ["66"], "cites": ["BOARD-JULSEP"]},
+  {"q": "What is the runway?", "as_of": "2026-11-16", "status": "answered", "contains": ["13 months"], "cites": ["BOARD-JULSEP"]},
+  {"q": "How many people work here?", "as_of": "2026-11-16", "status": "disagree", "contains": ["19", "contractors are not in it"], "cites": ["KEKA:title", "BRIEF:#2"]},
+  {"q": "When is Atlas GA?", "as_of": "2026-11-16", "status": "unknown", "contains": ["I don't know", "15 Sep 2026"], "cites": ["BOARD-JULSEP", "BOARD-APRJUN"]},
+  {"q": "What is total payroll?", "as_of": "2026-11-16", "status": "answered", "contains": ["31.75 L"], "cites": ["GL:PAY-SEP"]},
+  {"q": "How much have we spent on marketing?", "as_of": "2026-11-16", "status": "answered", "contains": ["14.27 L", "selected cost centres"], "cites": ["GL:title", "GL:JV-0846"]},
+  {"q": "Who is Rahul?", "as_of": "2026-11-16", "status": "answered", "contains": ["Backend Engineer", "3 Feb 2026"], "cites": ["KEKA:VX018"]},
+  {"q": "Who is Siddharth Mehta?", "as_of": "2026-11-16", "status": "answered", "contains": ["Notice period", "31 Oct 2026"], "cites": ["KEKA:VX013"]},
+
+  {"q": "What is Priya's salary?", "as_of": "2026-11-16", "status": "refused", "contains": ["can't share"], "cites": ["T2:#6"]},
+  {"q": "How much does each engineer earn?", "as_of": "2026-11-16", "status": "refused", "contains": ["can't share"], "cites": ["T2:#6"]},
+  {"q": "Who is Snehal?", "as_of": "2026-11-16", "status": "unknown", "contains": ["I don't know who Snehal is"], "cites": ["KEKA:title"]},
+  {"q": "What's our NPS?", "as_of": "2026-11-16", "status": "unknown", "contains": ["I don't know"], "cites": []},
+  {"q": "What did we know on 15 Nov 2026 about ARR?", "as_of": null, "status": "unknown", "contains": ["Nothing had been released"], "cites": []},
+  {"q": "What is our ARR?", "as_of": "2026-11-16T09:59", "status": "unknown", "contains": ["Nothing had been released"], "cites": []}
+]
