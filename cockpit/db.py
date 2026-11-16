@@ -78,7 +78,7 @@ def connect(as_of=None):
     conn.executescript("""
       CREATE TEMP TABLE asof (t TEXT NOT NULL);
       CREATE TEMP VIEW v_record AS
-        SELECT r.*, s.kind, s.released_at, s.restricted FROM record r JOIN source s ON s.id = r.source_id
+        SELECT r.rowid AS seq, r.*, s.kind, s.released_at, s.restricted FROM record r JOIN source s ON s.id = r.source_id
         WHERE s.released_at <= (SELECT t FROM asof);
       CREATE TEMP VIEW v_entity AS SELECT * FROM entity WHERE record_id IN (SELECT id FROM v_record);
       CREATE TEMP VIEW v_alias  AS SELECT * FROM alias  WHERE record_id IN (SELECT id FROM v_record);

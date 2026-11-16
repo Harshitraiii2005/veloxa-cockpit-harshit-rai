@@ -13,6 +13,6 @@ fi
 .venv/bin/python -m cockpit.load
 case "${1:-run}" in
   test) .venv/bin/python -m unittest discover tests -v ;;
-  run)  echo "Data model built. The cockpit UI arrives on Day 2 (see README)." ;;
+  run)  .venv/bin/python -m cockpit ;;
   *)    echo "usage: ./run.sh [run|test]"; exit 2 ;;
 esac

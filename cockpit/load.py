@@ -77,8 +77,10 @@ def table_records(sid, rows, sheet=""):
 
 
 def xlsx(path, sid):
-    for ws in openpyxl.load_workbook(path, read_only=True, data_only=True).worksheets:
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    for ws in wb.worksheets:
         yield from table_records(sid, enumerate(ws.iter_rows(values_only=True), 1), ws.title)
+    wb.close()
 
 
 def csv_rows(path, sid):
