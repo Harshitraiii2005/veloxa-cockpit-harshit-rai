@@ -31,6 +31,7 @@ These are choices I could defend either way. Each entry says what I picked, the 
 - **Individual salaries.** T2: Meera says salaries "must never show up in anything Ananya sees, only totals". Totals are allowed.
 - **Survey comments for small teams.** The cockpit will not try to reconstruct them.
 - **Anything outside the data room.** It answers "I don't know" and names the record that would settle it.
+- *(added 17 Nov)* **Guessing at people nobody named.** When a leader mentions an unnamed person (for example T3: "one engineer I'm worried about"), the cockpit says nobody was named. It does not infer who from leave, commits or survey scores.
 
 ## D-007 · Raw data stays out of the public repo (16 Nov)
 **Picked:** `Veloxa_Hackathon_Release_Packs/` is git-ignored. `run.sh` unzips `Veloxa_Hackathon_Release_Packs.zip` if it is in the repo root, and stops with a clear message if neither the folder nor the zip is there.

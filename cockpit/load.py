@@ -35,6 +35,10 @@ SHORT = {
     "Payroll_Register_Jan-Mar_2026.xlsx": "PAYROLL",
     "Board_Update_Apr-Jun_2026.pdf": "BOARD-APRJUN",
     "Board_Update_Jul-Sep_2026.pdf": "BOARD-JULSEP",
+    "Leave_Register.xlsx": "LEAVE",           # Day 2
+    "Hiring_Tracker.xlsx": "HIRE",
+    "Pulse_Survey.xlsx": "PULSE",
+    "Resignation_Letter_SM.pdf": "RESIGN-SM",
 }
 RESTRICTED = {"PAYROLL"}  # D-006: individual salaries never reach the CEO row by row
 SKIP_DIRS = {"templates"}  # blank worksheets for my own use, not evidence
@@ -179,15 +183,18 @@ def build():
                              [(rid, sid, loc, occ, text, data and json.dumps(data, default=str))
                               for rid, loc, occ, text, data in PARSERS[path.suffix](path, sid)])
 
-    # People come straight from Keka; every name, first name (if unique) and email is an alias.
+    # People come straight from Keka. Aliases: full name, email, and (when unique among
+    # employees) first name and "P. Nair" style, which the leave register uses (A-007).
     people = conn.execute("SELECT id, data FROM record WHERE source_id = 'KEKA' AND data IS NOT NULL").fetchall()
     people = [(rid, json.loads(d)) for rid, d in people]
-    firsts = [p["Full Name"].split()[0].lower() for _, p in people]
+    short = {rid: (p["Full Name"].split()[0].lower(), f"{p['Full Name'][0]}. {p['Full Name'].split()[-1]}".lower())
+             for rid, p in people}
     for rid, p in people:
         conn.execute("INSERT INTO entity VALUES (?,?,?,?)", (p["Emp ID"], "person", p["Full Name"], rid))
         spellings = {p["Full Name"].lower(), p["Work Email"].lower()}
-        if firsts.count(p["Full Name"].split()[0].lower()) == 1:
-            spellings.add(p["Full Name"].split()[0].lower())
+        for i, form in enumerate(short[rid]):
+            if [s[i] for s in short.values()].count(form) == 1:
+                spellings.add(form)
         conn.executemany("INSERT INTO alias VALUES (?,?,?,?,?)",
                          [(s, p["Emp ID"], "H", rid, "Keka") for s in spellings])
 

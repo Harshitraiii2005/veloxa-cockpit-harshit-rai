@@ -30,8 +30,13 @@ class PointInTime(unittest.TestCase):
     def test_record_ids_cited_in_docs_exist(self):
         ids = {r[0] for r in connect("2026-12-31").execute("SELECT id FROM v_record")}
         for doc in ROOT.glob("*.md"):
-            for cited in re.findall(r"`([A-Z][A-Za-z_-]*:[\w#.-]+|EML-\d+|BOARD-[A-Z]+)`", doc.read_text()):
+            for cited in re.findall(r"`([A-Z][A-Za-z_-]*:[\w#.-]+|EML-\d+|BOARD-[A-Z]+|RESIGN-[A-Z]+)`", doc.read_text()):
                 self.assertTrue(cited in ids, f"{doc.name} cites {cited}, which is not a record")
+
+    def test_leave_register_names_resolve(self):
+        alias = dict(connect("2026-11-17").execute("SELECT alias, entity_id FROM v_alias").fetchall())
+        self.assertEqual(alias["p. nair"], "VX007")
+        self.assertEqual(alias["a. das"], "VX009")
 
     def test_payroll_is_restricted(self):
         rows = connect("2026-11-16").execute("SELECT DISTINCT source_id FROM v_record WHERE restricted = 1").fetchall()
