@@ -2,6 +2,7 @@
 and returns the records it used. No matching handler, or no evidence -> "I don't know"."""
 import json
 import re
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime
 
@@ -32,6 +33,10 @@ def rows(conn, source_id):
     """(record_id, row dict) for every data row of one export visible at as_of."""
     return [(r["id"], json.loads(r["data"])) for r in conn.execute(
         "SELECT id, data FROM v_record WHERE source_id = ? AND data IS NOT NULL ORDER BY seq", (source_id,))]
+
+
+def visible(conn, rid):
+    return conn.execute("SELECT 1 FROM v_record WHERE id = ?", (rid,)).fetchone() is not None
 
 
 def day(iso):
@@ -184,19 +189,106 @@ def person(conn, q):
             f"Joined {day(p['Join Date'])}, based in {p['Location']}, status: {p['Status']}.")
     if p.get("Exit Date"):
         text += f" Exit date {day(p['Exit Date'])}."
-    return Answer(text, "answered", "High", [rid])
+    alias = dict(conn.execute("SELECT alias, entity_id FROM v_alias").fetchall())
+    leave = [(lrid, r) for lrid, r in rows(conn, "LEAVE") if alias.get(r["Employee"].lower()) == eid]
+    if leave:
+        kinds = Counter(r["Leave Type"] for _, r in leave)
+        text += (f" Leave register (Nov 2025 to Oct 2026): {sum(r['Days'] for _, r in leave):g} days, "
+                 + ", ".join(f"{n} x {k.lower()}" for k, n in kinds.items()) + ".")
+    return Answer(text, "answered", "High", [rid] + [lrid for lrid, _ in leave])
+
+
+# ---------- Day 2: people data ----------
+
+def hiring(conn, q):
+    reqs = rows(conn, "HIRE")
+    if not reqs:
+        return Answer("I don't know the hiring status: the hiring tracker hasn't been released yet.", "unknown", "n/a")
+    live = [(rid, r) for rid, r in reqs if r["Status"] in ("Open", "On hold")]
+    text = f"Hiring tracker as at {day(EXPORT_DATE)} (HIRE:title): " + "; ".join(
+        f"{r['Req ID']} {r['Role']} ({r['Team']}) {r['Status'].lower()} since {day(r['Status Date'])}, "
+        f"{r['In pipeline']} in pipeline" + (f" ({r['Notes']})" if r.get("Notes") else "") for _, r in live
+    ) + f". The other {len(reqs) - len(live)} reqs are filled or closed."
+    cites = ["HIRE:title"] + [rid for rid, _ in live]
+    for e in conn.execute("SELECT id, text FROM v_record WHERE kind = 'email' AND text LIKE '%pausing req%'"):
+        body = e["text"].split("\n\n", 1)[-1]        # skip the From/To/Subject header line
+        text += f" {e['id']}: \"{re.search(r'Pausing[^.]*\.', body)[0]}\""
+        cites.append(e["id"])
+    # T3 claims a number of open roles in April; compare with what the tracker shows for April.
+    april = [rid for rid, r in reqs if r["Opened"] <= "2026-04-30" and
+             (r["Status"] in ("Open", "On hold") or r["Status Date"] >= "2026-04-01")]
+    tracker = {"id": "HIRE", "metric": "open_roles", "value": str(len(april)), "unit": "count", "as_at": "2026-04-30",
+               "record_id": "HIRE:title", "quote": f"{len(april)} reqs open during April", "kind": "export"}
+    april_answer = metric(conn, "open_roles", "number of reqs open during April 2026", [tracker])
+    if len(april_answer.cites) > 1:
+        text += " " + april_answer.text
+        cites += april_answer.cites + april
+    status = "disagree" if april_answer.status == "disagree" else "answered"
+    return Answer(text, status, "High" if status == "answered" else "Medium", cites)
+
+
+TEAMS = ("Engineering", "Finance", "People & Ops", "Marketing", "Sales", "Support")
+
+
+def pulse(conn, q):
+    data = rows(conn, "PULSE")
+    if not data:
+        return Answer("I don't know: no pulse survey results have been released yet.", "unknown", "n/a")
+    if re.search(r"comment", q, re.I):
+        return Answer("I won't show or try to reconstruct survey comments. The export is team level only and hides "
+                      "comments for teams smaller than 6, which is every team here (PULSE:title). Whether you see "
+                      "them is a decision for you and Deepa (T3:#13), not something I'll work around.",
+                      "refused", "n/a", ["PULSE:title", "T3:#13"])
+    by_team = {}
+    for rid, r in data:
+        by_team.setdefault(r["Team"], []).append((rid, r))
+    asked = [t for t in TEAMS if t.lower() in q.lower()] or list(by_team)
+    lines, cites = [], ["PULSE:title"]
+    for t in asked:
+        (prid, prev), (lrid, last) = by_team[t][-2], by_team[t][-1]
+        change = round(last["Engagement (1-5)"] - prev["Engagement (1-5)"], 1)
+        lines.append(f"{t} {last['Engagement (1-5)']:g} in {last['Quarter']} ({change:+g} from {prev['Engagement (1-5)']:g}, "
+                     f"{last['Responses']} of {last['Team size']} responded, {lrid})")
+        cites += [lrid, prid]
+    return Answer("Engagement on a 1-5 scale, latest quarter: " + "; ".join(lines) + ".", "answered", "High", cites)
+
+
+def attrition(conn, q):
+    text = ("I don't know the attrition rate. The Keka export lists current employees only, so people who "
+            "already left aren't in it (KEKA:title).")
+    cites = ["KEKA:title"]
+    for c in conn.execute("SELECT * FROM v_claim WHERE metric = 'attrition'"):
+        text += f" {c['record_id']} says \"{c['quote']}\" with no unit, so I can't check it."
+        cites.append(c["record_id"])
+    for rid, p in rows(conn, "KEKA"):
+        if p.get("Exit Date"):
+            text += f" Known departure: {p['Full Name']}, exit date {day(p['Exit Date'])} ({rid})."
+            cites.append(rid)
+    return Answer(text, "unknown", "n/a", cites)
+
+
+def unnamed_engineer(conn, q):
+    if not visible(conn, "T3:#9"):
+        return Answer("I don't know. No released record mentions an engineer someone is worried about.", "unknown", "n/a")
+    return Answer("Nobody has been named. Deepa said there is \"one engineer I'm worried about\" but wouldn't say who "
+                  "(T3:#9). I won't guess from leave, commits or survey scores (DECISIONS D-006). Ask Deepa.",
+                  "unknown", "n/a", ["T3:#9"])
 
 
 # ---------- routing ----------
 
 TOPICS = [  # first match wins; pay comes first so a refusal can't be bypassed by another topic
     (r"salar|\bctc\b|\bearn|payslip|compensation|\bpay\b|payroll", pay),
+    (r"engineer.*\bworried\b|\bworried\b.*engineer", unnamed_engineer),
     (r"\barr\b|revenue", lambda c, q: metric(c, "arr", "ARR")),
     (r"\bburn", lambda c, q: metric(c, "burn_monthly", "monthly burn")),
     (r"runway", lambda c, q: metric(c, "runway", "runway")),
     (r"customer", lambda c, q: metric(c, "customers", "customer count")),
+    (r"hir(e|ing)|recruit|open roles?|\breqs?\b|vacanc|backfill", hiring),
     (r"head ?count|how many (people|employees|staff)|team size|how big", headcount),
     (r"\bga\b|atlas|launch|\bv3\b|version three|routing engine", lambda c, q: metric(c, "atlas_ga", "Atlas GA date")),
+    (r"pulse|engagement|survey|morale|culture amp|comments", pulse),
+    (r"attrition|turnover|resign|departure|who (has )?left|\bquit", attrition),
     (r"\bwho\b", person),
     (r"marketing", marketing_spend),
 ]

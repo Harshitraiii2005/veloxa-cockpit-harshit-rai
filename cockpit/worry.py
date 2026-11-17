@@ -6,7 +6,7 @@ from datetime import date
 from difflib import SequenceMatcher
 from itertools import combinations
 
-from .answer import day, inr, metric, rows
+from .answer import day, inr, metric, rows, visible
 from .db import connect
 
 RANK = {"High": 0, "Medium": 1, "Low": 2}
@@ -64,14 +64,53 @@ def lookalike_vendors(conn):
                             "Medium", [ra, rb])
 
 
-def paid_for_paused_hiring(conn):
+def backend_hiring_paused(conn):
+    """Hiring the board said would de-risk Atlas is paused, after money was spent on it."""
     fees = [(rid, r) for rid, r in rows(conn, "GL") if r["Cost Centre"] == "PPL-HIR"]
+    held = [(rid, r) for rid, r in rows(conn, "HIRE") if r["Status"] == "On hold"]
     paused = [r["id"] for r in conn.execute(
         "SELECT id FROM v_record WHERE kind IN ('document', 'email') AND (text LIKE '%hiring is paused%' OR text LIKE '%pausing req%')")]
-    for rid, r in fees if paused else []:
-        yield Worry(3, "A recruiter advance was paid for hiring that is now paused",
-                    f"{inr(r['Amount (Rs.)'])} paid to {r['Vendor / Payee']} on {day(r['Txn Date'])} ({r['Narration']}), "
-                    f"but {', '.join(paused)} {'says' if len(paused) == 1 else 'say'} hiring is paused.", "Medium", [rid] + paused)
+    if not paused or not (fees or held):
+        return
+    why = []
+    if held:
+        why.append(", ".join(f"{r['Req ID']} {r['Role']}" for _, r in held) + f" on hold since {day(held[0][1]['Status Date'])} "
+                   f"with {sum(r['In pipeline'] for _, r in held)} candidates in the pipeline")
+    why += [f"{inr(r['Amount (Rs.)'])} paid to {r['Vendor / Payee']} on {day(r['Txn Date'])} ({r['Narration']})" for _, r in fees]
+    why.append(f"paused per {', '.join(paused)}")
+    board = [rid for rid in ("BOARD-APRJUN",) if visible(conn, rid)]   # "two backend engineers ... to de-risk Atlas"
+    yield Worry(4, "Backend hiring meant to de-risk Atlas is on hold, after a recruiter advance was paid",
+                "; ".join(why) + ".", "High" if held else "Medium", [rid for rid, _ in held + fees] + paused + board)
+
+
+def engagement_drop(conn):
+    """A team whose pulse score fell by 0.4 or more quarter on quarter."""
+    by_team = {}
+    for rid, r in rows(conn, "PULSE"):
+        by_team.setdefault(r["Team"], []).append((rid, r))
+    for team, hist in by_team.items():
+        (prid, prev), (lrid, last) = hist[-2], hist[-1]
+        drop = round(prev["Engagement (1-5)"] - last["Engagement (1-5)"], 2)   # round: 3.8 - 3.4 is 0.3999...
+        if drop >= 0.4:
+            yield Worry(4 if drop >= 0.6 else 3,
+                        f"{team} engagement fell from {prev['Engagement (1-5)']:g} to {last['Engagement (1-5)']:g} in {last['Quarter']}",
+                        f"{last['Responses']} of {last['Team size']} responded. Comments are hidden because the team is smaller "
+                        f"than 6 (PULSE:title), so the score is all there is.", "Medium", [lrid, prid, "PULSE:title"])
+
+
+def departures(conn):
+    """Someone with an exit date, and whether a backfill exists."""
+    for rid, p in rows(conn, "KEKA"):
+        if not p.get("Exit Date"):
+            continue
+        backfill = [(hid, h) for hid, h in rows(conn, "HIRE")
+                    if h["Team"] == p["Department"] and "backfill" in (h.get("Notes") or "").lower()]
+        letters = [r["id"] for r in conn.execute(
+            "SELECT id FROM v_record WHERE kind = 'document' AND text LIKE ?", (f"%{p['Full Name']}%resignation%",))]
+        why = (f"{backfill[0][1]['Req ID']} backfill opened {day(backfill[0][1]['Opened'])}, {backfill[0][1]['In pipeline']} in the pipeline."
+               if backfill else "No backfill req is on record.")
+        yield Worry(2, f"{p['Full Name']} ({p['Title']}, {p['Department']}) is leaving: exit date {day(p['Exit Date'])}",
+                    why, "High", [rid] + letters + [hid for hid, _ in backfill])
 
 
 def numbers_disagree(conn):
@@ -84,7 +123,8 @@ def numbers_disagree(conn):
                     + ", ".join(l for l, _ in hits) + " to see the quotes side by side.", "High", [c for _, a in hits for c in a.cites])
 
 
-RULES = [atlas_date_unknown, joiner_paid_full_month, lookalike_vendors, paid_for_paused_hiring, numbers_disagree]
+RULES = [atlas_date_unknown, backend_hiring_paused, engagement_drop, joiner_paid_full_month, lookalike_vendors,
+         departures, numbers_disagree]
 
 
 def worries(as_of=None):
