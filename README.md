@@ -2,7 +2,7 @@
 
 Ananya Rao (CEO, Veloxa Technologies) asks one question and gets a short answer. Each answer cites the records it rests on, states a confidence level, and admits when the sources disagree or don't say. It is built for the Hiyaku Systems hackathon (16–20 Nov 2026), on top of the Veloxa release packs. Veloxa is a fictional company.
 
-**Status:** Day 1. The loader builds `veloxa.db` from all four folders with release-date gating. The cockpit answers questions on Day 1 data and shows a ranked worry list. See [ARCHITECTURE.md](ARCHITECTURE.md).
+**Status:** Day 2. The loader builds `veloxa.db` from all four folders with release-date gating. The cockpit answers questions on the Day 1 and Day 2 data and opens on the top three worries (T6a). See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## One command
 
@@ -14,12 +14,12 @@ The release packs aren't committed, because they were sent as confidential (DECI
 
 ## Using it
 
-`./run.sh` prints the ranked worry list, then asks for questions. You can also run one question at a time:
+`./run.sh` opens on the top three worries (items new since the day before are marked NEW), then asks for questions. Type `more` to see every worry. You can also run one question at a time:
 
 ```bash
 .venv/bin/python -m cockpit ask "What is our ARR?"
 .venv/bin/python -m cockpit ask "When is Atlas GA?" --as-of 2026-11-16
-.venv/bin/python -m cockpit worry --as-of 2026-11-16
+.venv/bin/python -m cockpit worry --as-of 2026-11-17 --all
 ```
 
 Every answer ends with a confidence level, a status (`answered`, `unknown`, `disagree` or `refused`) and the record IDs it used. `--as-of` limits the cockpit to what had been released by that date. A question like "what did we know on 15 Nov 2026 about ARR?" sets that date itself.
@@ -30,7 +30,7 @@ Every answer ends with a confidence level, a status (`answered`, `unknown`, `dis
 ./run.sh test
 ```
 
-This runs the loader and point-in-time checks, plus the cockpit question set in `tests/questions.json`. Each case gives a question, an `as_of` date, the expected status, words the answer must contain, and records it must cite. There are 16 cases so far (10 of them refusals, unknowns or disagreements), and the target is 25+ by Friday.
+This runs the loader and point-in-time checks, plus the cockpit question set in `tests/questions.json`. Each case gives a question, an `as_of` date, the expected status, words the answer must contain, and records it must cite. An optional `absent` list checks that later material doesn't leak into an earlier answer. There are 26 cases (18 of them refusals, unknowns or disagreements), and a test enforces the brief's minimums of 25 and 5.
 
 ## Repo map
 

@@ -9,11 +9,20 @@
   {"q": "How much have we spent on marketing?", "as_of": "2026-11-16", "status": "answered", "contains": ["14.27 L", "selected cost centres"], "cites": ["GL:title", "GL:JV-0846"]},
   {"q": "Who is Rahul?", "as_of": "2026-11-16", "status": "answered", "contains": ["Backend Engineer", "3 Feb 2026"], "cites": ["KEKA:VX018"]},
   {"q": "Who is Siddharth Mehta?", "as_of": "2026-11-16", "status": "answered", "contains": ["Notice period", "31 Oct 2026"], "cites": ["KEKA:VX013"]},
-
   {"q": "What is Priya's salary?", "as_of": "2026-11-16", "status": "refused", "contains": ["can't share"], "cites": ["T2:#6"]},
   {"q": "How much does each engineer earn?", "as_of": "2026-11-16", "status": "refused", "contains": ["can't share"], "cites": ["T2:#6"]},
   {"q": "Who is Snehal?", "as_of": "2026-11-16", "status": "unknown", "contains": ["I don't know who Snehal is"], "cites": ["KEKA:title"]},
   {"q": "What's our NPS?", "as_of": "2026-11-16", "status": "unknown", "contains": ["I don't know"], "cites": []},
   {"q": "What did we know on 15 Nov 2026 about ARR?", "as_of": null, "status": "unknown", "contains": ["Nothing had been released"], "cites": []},
-  {"q": "What is our ARR?", "as_of": "2026-11-16T09:59", "status": "unknown", "contains": ["Nothing had been released"], "cites": []}
+  {"q": "What is our ARR?", "as_of": "2026-11-16T09:59", "status": "unknown", "contains": ["Nothing had been released"], "cites": []},
+  {"q": "What's the hiring status?", "as_of": "2026-11-17", "status": "disagree", "contains": ["REQ-014", "on hold", "twenty-two"], "cites": ["HIRE:REQ-014", "EML-06", "T3:#6"]},
+  {"q": "What's the hiring status?", "as_of": "2026-11-16", "status": "unknown", "contains": ["hasn't been released"], "cites": [], "absent": ["REQ-014"]},
+  {"q": "What did we know on 16 Nov 2026 about hiring?", "as_of": null, "status": "unknown", "contains": ["hasn't been released"], "cites": []},
+  {"q": "How is engineering morale?", "as_of": "2026-11-17", "status": "answered", "contains": ["3.1", "4 of 5"], "cites": ["PULSE:r7", "PULSE:r6"]},
+  {"q": "How is engineering morale?", "as_of": "2026-11-16", "status": "unknown", "contains": ["I don't know"], "cites": [], "absent": ["3.1"]},
+  {"q": "Show me the engineering survey comments", "as_of": "2026-11-17", "status": "refused", "contains": ["won't show"], "cites": ["PULSE:title"]},
+  {"q": "What is our attrition rate?", "as_of": "2026-11-17", "status": "unknown", "contains": ["about twelve", "current employees only"], "cites": ["T3:#3", "KEKA:title"]},
+  {"q": "What is our attrition rate?", "as_of": "2026-11-16", "status": "unknown", "contains": ["current employees only"], "cites": ["KEKA:title"], "absent": ["twelve"]},
+  {"q": "Which engineer is Deepa worried about?", "as_of": "2026-11-17", "status": "unknown", "contains": ["Nobody has been named"], "cites": ["T3:#9"]},
+  {"q": "Who is P. Nair?", "as_of": "2026-11-17", "status": "answered", "contains": ["Priya Nair", "3.5 days"], "cites": ["KEKA:VX007", "LEAVE:2026-09-03"]}
 ]

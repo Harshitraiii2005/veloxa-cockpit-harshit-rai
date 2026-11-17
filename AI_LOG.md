@@ -2,6 +2,21 @@
 
 Tool: an AI coding assistant in VS Code. Entries are newest first.
 
+## 17 Nov (Day 2)
+
+**Tasks given to AI**
+- Read the Day 2 folder, list the T3 lines that conflict with the exports (TN-12 to TN-21), and add the Day 2 evidence to the Day 1 notes. As on Day 1, it collected evidence only; the conclusions are mine.
+- Add the Day 2 answers (hiring, pulse, attrition, the unnamed engineer, leave on person cards), the worry rules, and the top-three opening view for T6a.
+- Draft responses/T6a.md. I chose what to push back on: never cut a 5/5, never pad the list, keep the evidence.
+
+**Where it was wrong / what I changed**
+- Its quote of Meera's pause email (`EML-06`) grabbed the subject/date header line, not the sentence in the body. I caught this reading the output and now search the body only.
+- It named a test variable `top`, which hid the new `top()` function inside that test. I renamed it.
+- I asked for engagement drops "of 0.4 or more". 3.8 − 3.4 is 0.3999… in floating point, so marketing would have been silently missed. The rule rounds before comparing, and a comment explains why.
+
+**What I did not let it do**
+- Build any rule that infers who might be job-hunting from personal leave, commit hours or survey scores. Deepa's unnamed engineer stays unnamed (DECISIONS D-006).
+
 ## 16 Nov (Day 1)
 
 **Tasks given to AI**

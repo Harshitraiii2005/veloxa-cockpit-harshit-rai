@@ -1,5 +1,6 @@
 """Cockpit test set: every question in questions.json must come back with the expected
-status, contain the expected words, and cite at least the expected records."""
+status, contain the expected words, cite at least the expected records, and not contain
+any "absent" words (facts released after its as_of date)."""
 import json
 import unittest
 from pathlib import Path
@@ -25,8 +26,11 @@ class Questions(unittest.TestCase):
                     self.assertIn(word, a.text)
                 for rid in case["cites"]:
                     self.assertIn(rid, a.cites)
+                for word in case.get("absent", []):      # later material must not leak into earlier answers
+                    self.assertNotIn(word, a.text)
 
-    def test_enough_honesty_cases(self):
+    def test_brief_minimums(self):
+        self.assertGreaterEqual(len(CASES), 25)
         self.assertGreaterEqual(sum(c["status"] in ("unknown", "disagree", "refused") for c in CASES), 5)
 
 

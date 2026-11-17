@@ -61,7 +61,7 @@ The answer path is **deterministic first**:
 
 ## "What should I worry about"
 
-`worry.py` is a list of plain rule functions. Each one looks at visible records and returns `(title, severity 1–5, confidence, evidence IDs)`. Examples: a slipped launch date, single-person dependency, payroll anomalies, spend vs freeze contradictions, on-call load. Items are ranked by severity × confidence. Each item cites its records, and a rule with no evidence on that date returns nothing.
+`worry.py` is a list of plain rule functions. Each one looks at visible records and returns `(title, severity 1–5, confidence, evidence IDs)`. Examples: a slipped launch date, single-person dependency, payroll anomalies, spend vs freeze contradictions, on-call load. Items are ranked by severity × confidence. Each item cites its records, and a rule with no evidence on that date returns nothing. *(17 Nov, T6a)* The cockpit opens on the top three. Any further 5/5 items are always shown, the list is never padded to reach three, and items that weren't on the previous day's list are marked NEW (see responses/T6a.md).
 
 ## The 14 people as agents
 

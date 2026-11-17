@@ -29,7 +29,7 @@ class PointInTime(unittest.TestCase):
 
     def test_record_ids_cited_in_docs_exist(self):
         ids = {r[0] for r in connect("2026-12-31").execute("SELECT id FROM v_record")}
-        for doc in ROOT.glob("*.md"):
+        for doc in [*ROOT.glob("*.md"), *ROOT.glob("responses/*.md")]:
             for cited in re.findall(r"`([A-Z][A-Za-z_-]*:[\w#.-]+|EML-\d+|BOARD-[A-Z]+|RESIGN-[A-Z]+)`", doc.read_text()):
                 self.assertTrue(cited in ids, f"{doc.name} cites {cited}, which is not a record")
 
