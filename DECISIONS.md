@@ -37,3 +37,9 @@ These are choices I could defend either way. Each entry says what I picked, the 
 **Picked:** `Veloxa_Hackathon_Release_Packs/` is git-ignored. `run.sh` unzips `Veloxa_Hackathon_Release_Packs.zip` if it is in the repo root, and stops with a clear message if neither the folder nor the zip is there.
 **Alternative:** commit the packs, so a fresh clone runs with no extra step.
 **Why:** The material was sent as confidential, and the rules say not to share it with other candidates. A public repo would do exactly that. Graders already have the zip, so the cost is copying one file.
+
+## D-008 · Agents are offline: grounded facts plus fixed persona lines (17 Nov)
+**Picked:** each agent answers from facts computed from records at `as_of` (cited by record ID), plus a few fixed persona lines in `curation/people.json` (cited by assumption ID). No LLM.
+**Alternative:** an LLM role-plays each person, using their records as context.
+**Why:** The graders' fresh clone has no API key, and answers must be testable and stay consistent with the records. Fixed persona text can't drift and can be reviewed in a diff. The cost is that the agents are less conversational: an unmatched question gets "I'd rather not guess". If there's time, an optional LLM layer can rephrase these answers, using the same citation check as the cockpit.
+

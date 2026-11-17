@@ -1,0 +1,100 @@
+{
+  "VX004": {
+    "assumption": "A-104",
+    "work": "Atlas is the whole job right now. My week is planning, unblocking people and arguing for headcount.",
+    "life": "I live in HSR Layout with my wife and our two kids. Saturday mornings I try to cycle to Nandi Hills; most Saturdays I don't get up in time.",
+    "mood": "Stretched. I asked for more people and didn't get them. I'd still rather ship Atlas late than ship it broken.",
+    "leave_note": "That week in October was Kerala, with my parents. First real break this year."
+  },
+  "VX007": {
+    "assumption": "A-107",
+    "work": "I own the routing core and most of the re-routing work. If something in the engine breaks, it usually ends up with me.",
+    "life": "I live in Indiranagar. My mother moved in with me this year, so evenings are more about home than they used to be. I still try to get to the climbing gym on Sundays.",
+    "mood": "Tired, if I'm honest. I like the problem. I'm less sure the load is sustainable.",
+    "leave_note": "The half-days were personal. I'd rather not go into it."
+  },
+  "VX009": {
+    "assumption": "A-109",
+    "work": "I build the planner UI. Most of my day is front-end work, plus reviews over Slack and video since I moved.",
+    "life": "My partner got a job in Pune, so we moved there this year. We're near Baner, and it turns out I like living somewhere I can see hills.",
+    "mood": "Good. Pune has worked out. My worry is being out of sight when decisions get made in Bengaluru.",
+    "leave_note": "The relocation week was the move itself, boxes and all."
+  },
+  "VX012": {
+    "assumption": "A-112",
+    "work": "I'm the only SRE on staff, so reliability, alerts and deploys all land on me.",
+    "life": "I share a flat in Koramangala with two friends from college. I play badminton twice a week when work allows.",
+    "mood": "Busy. I'd like one quiet month. I don't think I've had one this year.",
+    "leave_note": "The two sick days in April were a bad bout of flu."
+  },
+  "VX018": {
+    "assumption": "A-118",
+    "work": "I joined in February and I'm on backend pieces for Atlas. Still learning where everything lives.",
+    "life": "I moved to Bengaluru from Lucknow for this job. I'm in a PG near the office and I call home most evenings.",
+    "mood": "Mostly good. One thing still bugs me: my first payslip looked too high, and I never heard back.",
+    "leave_note": "One day off in July for a cousin's wedding."
+  },
+  "VX003": {
+    "assumption": "A-103",
+    "work": "I own the numbers: burn, runway, the raise. This quarter that mostly means saying no to spending.",
+    "life": "I'm a chartered accountant by training. I run most mornings around Ulsoor Lake, and my daughter is in her final year of school, so the house is all board exams right now.",
+    "mood": "Focused on the round. Until it closes, every rupee matters.",
+    "leave_note": "I haven't taken proper leave this year. That's probably a problem."
+  },
+  "VX010": {
+    "assumption": "A-110",
+    "work": "Planning and forecasts. I also covered February payroll while Fatima was away.",
+    "life": "I'm doing the CFA, so most weekends are study. I live in Jayanagar with my parents.",
+    "mood": "A bit behind on forecasts. The exams eat my evenings.",
+    "leave_note": "The exam leave in May was for the CFA."
+  },
+  "VX014": {
+    "assumption": "A-114",
+    "work": "Accounts and payroll. I enter the ledger and run payroll every month.",
+    "life": "I got married in February. We've just set up a flat in Frazer Town, and weekends are mostly family visits on both sides.",
+    "mood": "Catching up. The month I was away left a few loose ends.",
+    "leave_note": "That was my wedding leave."
+  },
+  "VX005": {
+    "assumption": "A-105",
+    "work": "Hiring, surveys, exits and policy. I try to make sure people's problems reach Ananya before they turn into resignations.",
+    "life": "I live in Malleswaram. I'm learning Carnatic vocals, badly, and my son has just started college in Pune.",
+    "mood": "Watchful. Survey numbers only tell you so much about how people are doing.",
+    "leave_note": "A week in Coorg. First proper break in a year."
+  },
+  "VX015": {
+    "assumption": "A-115",
+    "work": "I run hiring end to end: sourcing, interviews, offers. Mostly on video from Kolkata.",
+    "life": "I live in Kolkata with my parents. Sundays are for football, watching or playing.",
+    "mood": "Frustrated. Candidates go cold fast when roles are put on hold.",
+    "leave_note": "I haven't taken leave this year."
+  },
+  "VX017": {
+    "assumption": "A-117",
+    "work": "Office and HR admin: joining paperwork, leave records, and keeping the WeWork space running.",
+    "life": "This is my first year at Veloxa. I commute from Whitefield, which is its own adventure, and I'm doing a weekend course in HR management.",
+    "mood": "Still learning. Everyone here moves fast.",
+    "leave_note": "One day in October for a family function."
+  },
+  "VX006": {
+    "assumption": "A-106",
+    "work": "Brand, demand and events. The September summit was the big one this year.",
+    "life": "I live in Whitefield with my wife. I'm the one who organises every trip with our friends.",
+    "mood": "Good about the summit. Tired of defending the spend.",
+    "leave_note": "Just the one day in June."
+  },
+  "VX011": {
+    "assumption": "A-111",
+    "work": "Paid channels, mostly Google Ads, and making the numbers add up.",
+    "life": "I live in BTM Layout with my sister. I bake on weekends and sell a little at a Sunday market.",
+    "mood": "Fine. I'd like marketing and finance to agree on one set of numbers.",
+    "leave_note": "A week in June, at home in Hyderabad."
+  },
+  "VX013": {
+    "assumption": "A-113",
+    "work": "Product marketing: launch materials, positioning, sales decks.",
+    "life": "I play guitar in a weekend cover band, and I'm taking a short break before whatever comes next.",
+    "mood": "Ready for something new.",
+    "leave_note": "A week in August, before things got busy."
+  }
+}

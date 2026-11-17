@@ -68,9 +68,9 @@ The answer path is **deterministic first**:
 The 14 are the Keka employees in Engineering (5), Finance (3), People & Ops (3) and Marketing (3), which matches the brief's "14 people across engineering, finance, HR and marketing". Each agent has two layers:
 
 - **Grounded facts**, computed from records at `as_of`: role, manager, tickets, commits, incidents, leave, emails. These are never stored by hand, so they can't drift from the data.
-- **Persona** in `curation/people/*.json`: voice, worries, life outside work. Every invented item carries an assumption ID (`A-0xx`) that points to ASSUMPTIONS.md.
+- **Persona** in `curation/people.json`: how they describe their work, their life outside work, their mood, and a note on their leave. Each person's persona carries one assumption ID (`A-1` + their Emp ID number) that points to ASSUMPTIONS.md.
 
-Agent memory is the set of visible records that mention them plus their persona. No free-running memory, so an agent can't "remember" something the record contradicts. If a key is set, the LLM role-plays the agent with that context. Offline, the agent answers from its grounded facts in a templated voice.
+Agent memory is the set of visible records that mention them plus their persona. No free-running memory, so an agent can't "remember" something the record contradicts. *(17 Nov)* Agents are offline only (D-008). `python -m cockpit agent NAME "question"`, or `@name question` at the prompt, routes the question to work, leave, life, mood, pay (refused) or quitting (answered only if a record shows a resignation). Anything else gets "I'd rather not guess".
 
 ## Point-in-time
 
