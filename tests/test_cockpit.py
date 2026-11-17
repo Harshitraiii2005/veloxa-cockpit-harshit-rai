@@ -6,7 +6,7 @@ from pathlib import Path
 
 from cockpit.answer import ask
 from cockpit.load import build
-from cockpit.worry import worries
+from cockpit.worry import Worry, top, worries
 
 CASES = json.loads((Path(__file__).parent / "questions.json").read_text())
 
@@ -35,14 +35,24 @@ class Worries(unittest.TestCase):
         self.assertEqual(worries("2026-11-15"), [])
 
     def test_day1_top_worry_is_atlas(self):
-        top = worries("2026-11-16")[0]
-        self.assertIn("Atlas", top.title)
-        self.assertIn("BOARD-JULSEP", top.cites)
+        first = worries("2026-11-16")[0]
+        self.assertIn("Atlas", first.title)
+        self.assertIn("BOARD-JULSEP", first.cites)
 
     def test_hotel_is_not_a_duplicate_vendor(self):
         titles = " ".join(w.title for w in worries("2026-11-16"))
         self.assertIn("Saphire Event Mgmt", titles)
         self.assertNotIn("Sapphire Residency Hotel", titles)
+
+    def test_t6a_opens_on_top_three(self):
+        items = worries("2026-11-17")
+        self.assertGreater(len(items), 3)
+        self.assertEqual(top(items), items[:3])
+
+    def test_t6a_never_cuts_a_five_or_pads(self):
+        fives = [Worry(5, f"w{i}", "", "High", []) for i in range(4)]
+        self.assertEqual(len(top(fives)), 4)
+        self.assertEqual(len(top(fives[:1])), 1)
 
     def test_payroll_worry_shows_no_amounts(self):
         w = next(w for w in worries("2026-11-16") if "payroll" in w.title)

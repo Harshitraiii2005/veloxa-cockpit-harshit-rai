@@ -127,6 +127,11 @@ RULES = [atlas_date_unknown, backend_hiring_paused, engagement_drop, joiner_paid
          departures, numbers_disagree]
 
 
+def top(items, n=3):
+    """T6a: open on the top n. Any 5/5 still shows even past n, and the list is never padded."""
+    return [w for i, w in enumerate(items) if i < n or w.severity == 5]
+
+
 def worries(as_of=None):
     conn = connect(as_of)
     items = [w for rule in RULES for w in rule(conn)]
