@@ -118,7 +118,7 @@ def metric(conn, name, label, extra=()):
         text += " Earlier: " + "; ".join(f"{show(c)} {when} {day(c['as_at'])} ({c['record_id']})" for c in earlier) + "."
     if set_aside:
         text += " Set aside: " + "; ".join(
-            f"{c['record_id']} \"{c['quote']}\" ({verdicts[c['id']]['verdict']}, {verdicts[c['id']]['reason']})"
+            f"{c['record_id']} \"{c['quote']}\" ({verdicts[c['id']]['verdict']}, see {verdicts[c['id']]['reason']})"
             for c in set_aside) + "."
     if still_open:
         text += (" The sources disagree: " + "; ".join(f"{c['record_id']} says \"{c['quote']}\"" for c in still_open)
@@ -235,10 +235,11 @@ def pulse(conn, q):
     if not data:
         return Answer("I don't know: no pulse survey results have been released yet.", "unknown", "n/a")
     if re.search(r"comment", q, re.I):
-        return Answer("I won't show or try to reconstruct survey comments. The export is team level only and hides "
-                      "comments for teams smaller than 6, which is every team here (PULSE:title). Whether you see "
-                      "them is a decision for you and Deepa (T3:#13), not something I'll work around.",
-                      "refused", "n/a", ["PULSE:title", "T3:#13"])
+        # TN-17: Deepa's call (wants you to see comments) overrides her 29 Sep email; the export still has none.
+        return Answer("I don't have survey comments. The export is team level only and hides comments for teams "
+                      "smaller than 6, which is every team here (PULSE:title). Deepa has said she wants you to see "
+                      "them (T3:#3), so ask her for them directly. I won't try to reconstruct them from scores.",
+                      "unknown", "n/a", ["PULSE:title", "T3:#3"])
     by_team = {}
     for rid, r in data:
         by_team.setdefault(r["Team"], []).append((rid, r))

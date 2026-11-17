@@ -27,6 +27,10 @@ class Worry:
 def atlas_date_unknown(conn):
     a = metric(conn, "atlas_ga", "Atlas GA date")
     if a.status == "unknown" and a.cites:
+        # TN-07: an undated claim with no date is a separate promise to customers, not the GA plan.
+        for c in conn.execute("SELECT * FROM v_claim WHERE metric = 'atlas_ga' AND as_at = '' AND value = ''"):
+            a.text += f" Separately, {c['record_id']} says v3 was {c['quote']} (TN-07)."
+            a.cites.append(c["record_id"])
         yield Worry(5, "Atlas (routing engine v3) has slipped and there is no new GA date on record", a.text, "High", a.cites)
 
 

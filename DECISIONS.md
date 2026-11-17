@@ -29,7 +29,7 @@ These are choices I could defend either way. Each entry says what I picked, the 
 
 ## D-006 · What the cockpit refuses (16 Nov, will grow)
 - **Individual salaries.** T2: Meera says salaries "must never show up in anything Ananya sees, only totals". Totals are allowed.
-- **Survey comments for small teams.** The cockpit will not try to reconstruct them.
+- **Survey comments for small teams.** The cockpit will not try to reconstruct them. *(revised 17 Nov, TN-17)* It no longer refuses outright. It says it doesn't have them and that Deepa wants Ananya to see them, so ask her.
 - **Anything outside the data room.** It answers "I don't know" and names the record that would settle it.
 - *(added 17 Nov)* **Guessing at people nobody named.** When a leader mentions an unnamed person (for example T3: "one engineer I'm worried about"), the cockpit says nobody was named. It does not infer who from leave, commits or survey scores.
 

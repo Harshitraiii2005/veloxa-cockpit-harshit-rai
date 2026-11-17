@@ -14,6 +14,10 @@ Tool: an AI coding assistant in VS Code. Entries are newest first.
 - It named a test variable `top`, which hid the new `top()` function inside that test. I renamed it.
 - I asked for engagement drops "of 0.4 or more". 3.8 − 3.4 is 0.3999… in floating point, so marketing would have been silently missed. The rule rounds before comparing, and a comment explains why.
 
+**How the TRANSCRIPT_NOTES conclusions were made**
+- For each conflict, AI laid out two or three readings of the evidence already listed in the note, plus "leave it open". I chose one for every note, and AI wrote my choice up as the conclusion text. Where I didn't accept an option, the note stays open: I haven't accepted "Pria = Priya Nair", and TN-10 waits for Day 3. The verdicts.csv and aliases.csv rows follow directly from those choices.
+- Two of my calls changed how the cockpit behaves. TN-17: survey comments now get "I don't have them, ask Deepa", not a refusal. TN-07: the Atlas worry now also cites the festive-season promise to customers.
+
 **What I did not let it do**
 - Build any rule that infers who might be job-hunting from personal leave, commit hours or survey scores. Deepa's unnamed engineer stays unnamed (DECISIONS D-006).
 
