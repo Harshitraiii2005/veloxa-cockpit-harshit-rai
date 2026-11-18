@@ -49,6 +49,13 @@ CREATE TABLE claim (            -- a number or fact a source states, copied as s
   record_id TEXT NOT NULL REFERENCES record(id),
   quote TEXT NOT NULL
 );
+CREATE TABLE org_change (       -- announced reporting-line moves (curation/org_changes.csv), T6b
+  emp_id TEXT NOT NULL,         -- who moves
+  new_manager TEXT NOT NULL,    -- an Emp ID, or a label for a role nobody holds yet ("CRO, not yet named")
+  effective_from TEXT,          -- blank = announced but not dated; never guessed
+  record_id TEXT NOT NULL REFERENCES record(id),
+  note TEXT
+);
 CREATE TABLE verdict (          -- my call on a claim that disagrees (curation/verdicts.csv)
   claim_id TEXT NOT NULL REFERENCES claim(id),
   verdict TEXT NOT NULL,        -- misheard | wrong | different-measure | cannot-settle (stays a disagreement)
@@ -84,6 +91,7 @@ def connect(as_of=None):
       CREATE TEMP VIEW v_alias  AS SELECT * FROM alias  WHERE record_id IN (SELECT id FROM v_record);
       CREATE TEMP VIEW v_claim  AS
         SELECT c.*, r.kind FROM claim c JOIN v_record r ON r.id = c.record_id;
+      CREATE TEMP VIEW v_org_change AS SELECT * FROM org_change WHERE record_id IN (SELECT id FROM v_record);
       CREATE TEMP VIEW v_verdict AS
         SELECT * FROM verdict WHERE claim_id IN (SELECT id FROM v_claim) AND decided_on <= (SELECT t FROM asof);
     """)

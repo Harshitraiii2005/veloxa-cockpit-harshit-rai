@@ -6,11 +6,12 @@ import json
 import re
 from collections import Counter
 
-from .answer import Answer, commits, day, duty_facts, find_person, jira_points, rows
+from .answer import Answer, commits, day, duty_facts, find_person, jira_points, manager_of, rows
 from .db import ROOT, connect
 
 PERSONAS = json.loads((ROOT / "curation" / "people.json").read_text())
-FOURTEEN = ("Engineering", "Finance", "People & Ops", "Marketing")   # A-002
+# A-002: the 14 are fixed by Emp ID (the persona file), not by department, so moving someone
+# to another team or manager (T6b) never drops or adds an agent.
 
 TOPICS = [  # first match wins
     ("pay", r"salar|\bctc\b|\bearn|payslip amount|how much .*paid|\bpay\b"),
@@ -26,7 +27,7 @@ def interview(who, question, as_of=None):
     conn = connect(as_of)
     people = {r["Emp ID"]: (rid, r) for rid, r in rows(conn, "KEKA")}
     eid = find_person(conn, who)
-    if eid not in people or people[eid][1]["Department"] not in FOURTEEN:
+    if eid not in people or eid not in PERSONAS:
         return Answer(f"I don't have an agent for \"{who}\" in the records released so far. The 14 are the "
                       f"Engineering, Finance, People & Ops and Marketing staff in Keka.", "unknown", "n/a")
     rid, p = people[eid]
@@ -48,10 +49,10 @@ def interview(who, question, as_of=None):
     if topic in ("life", "mood"):
         return Answer(persona[topic], "answered", "Low", [persona["assumption"]])
     if topic == "work":
-        boss = people.get(p["Manager ID"], (None, {"Full Name": "nobody"}))[1]["Full Name"]
-        text = (f"I'm {p['Full Name']}, {p['Title']}, here since {day(p['Join Date'])}, reporting to {boss}. "
-                f"{persona['work']}")
-        cites = [rid, persona["assumption"]]
+        boss, note, org_cites = manager_of(conn, eid, people)
+        text = (f"I'm {p['Full Name']}, {p['Title']}, here since {day(p['Join Date'])}, reporting to {boss}."
+                f"{note if not note.startswith(' (') else ''} {persona['work']}")
+        cites = [rid, persona["assumption"]] + org_cites
         for sentence, refs in work_facts(conn, eid, p, people):
             text += " " + sentence
             cites += refs
@@ -73,9 +74,10 @@ def leave_answer(conn, eid, persona):
 
 def work_facts(conn, eid, p, people):
     """Grounded sentences about this person's work, each with the records behind it."""
-    reports = [(r_id, q) for r_id, q in people.values() if q["Manager ID"] == eid]
+    reports = [(r_id, q) for r_id, q in people.values() if manager_of(conn, q["Emp ID"], people)[0] == p["Full Name"]]
     if reports:
-        yield f"{len(reports)} people report to me: {', '.join(q['Full Name'] for _, q in reports)}.", [r for r, _ in reports]
+        yield (f"{len(reports)} {'person reports' if len(reports) == 1 else 'people report'} to me: "
+               f"{', '.join(q['Full Name'] for _, q in reports)}."), [r for r, _ in reports]
     reqs = [(hid, h) for hid, h in rows(conn, "HIRE") if h["Hiring Manager"] == eid]
     if reqs:
         yield ("I'm the hiring manager on " + "; ".join(f"{h['Req ID']} {h['Role']} ({h['Status'].lower()})" for _, h in reqs)
@@ -111,4 +113,4 @@ def work_facts(conn, eid, p, people):
 
 def roster(as_of=None):
     conn = connect(as_of)
-    return [(p["Emp ID"], p["Full Name"], p["Title"]) for _, p in rows(conn, "KEKA") if p["Department"] in FOURTEEN]
+    return [(p["Emp ID"], p["Full Name"], p["Title"]) for _, p in rows(conn, "KEKA") if p["Emp ID"] in PERSONAS]

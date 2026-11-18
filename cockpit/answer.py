@@ -84,6 +84,25 @@ def disagrees(c, best):
     return abs(a - b) > 0.1 * abs(b)    # within 10% counts as the same number
 
 
+def manager_of(conn, eid, people):
+    """(manager name, note) as at as_of. A dated org change overrides Keka from its effective date;
+    an undated one is shown as announced and changes nothing (T6b)."""
+    p = people[eid][1]
+    name = people.get(p["Manager ID"], (None, {"Full Name": "nobody (top of the org)"}))[1]["Full Name"]
+    cut = conn.execute("SELECT t FROM asof").fetchone()[0]
+    note, cites = "", []
+    for ch in conn.execute("SELECT * FROM v_org_change WHERE emp_id = ? ORDER BY effective_from", (eid,)):
+        new = people.get(ch["new_manager"], (None, {"Full Name": ch["new_manager"]}))[1]["Full Name"]
+        if ch["effective_from"] and ch["effective_from"] <= cut[:10]:
+            name, note = new, f" (changed on {day(ch['effective_from'])}, {ch['record_id']})"
+        elif not ch["effective_from"]:
+            note = f" Announced: will report to {new}, no date set yet ({ch['record_id']})."
+        else:
+            note = f" Will report to {new} from {day(ch['effective_from'])} ({ch['record_id']})."
+        cites.append(ch["record_id"])
+    return name, note, cites
+
+
 def find_person(conn, q):
     """Entity ID of the longest alias that appears in the question as a whole word."""
     ql = q.lower()
@@ -201,18 +220,21 @@ def person(conn, q):
         return Answer(text, "answered", "High", cites)
     people = {r["Emp ID"]: (rid, r) for rid, r in rows(conn, "KEKA")}
     rid, p = people[eid]
-    boss = people.get(p["Manager ID"], (None, {"Full Name": "nobody (top of the org)"}))[1]["Full Name"]
-    text = (f"{p['Full Name']} ({eid}) is {p['Title']} in {p['Department']}, reporting to {boss}. "
-            f"Joined {day(p['Join Date'])}, based in {p['Location']}, status: {p['Status']}.")
+    boss, note, org_cites = manager_of(conn, eid, people)
+    text = (f"{p['Full Name']} ({eid}) is {p['Title']} in {p['Department']}, reporting to {boss}"
+            f"{note if note.startswith(' (') else ''}. "
+            f"Joined {day(p['Join Date'])}, based in {p['Location']}, status: {p['Status']}."
+            f"{note if not note.startswith(' (') else ''}")
     if p.get("Exit Date"):
         text += f" Exit date {day(p['Exit Date'])}."
     alias = dict(conn.execute("SELECT alias, entity_id FROM v_alias").fetchall())
     leave = [(lrid, r) for lrid, r in rows(conn, "LEAVE") if alias.get(r["Employee"].lower()) == eid]
     if leave:
         kinds = Counter(r["Leave Type"] for _, r in leave)
-        text += (f" Leave register (Nov 2025 to Oct 2026): {sum(r['Days'] for _, r in leave):g} days, "
+        n = sum(r["Days"] for _, r in leave)
+        text += (f" Leave register (Nov 2025 to Oct 2026): {n:g} day{'' if n == 1 else 's'}, "
                  + ", ".join(f"{n} x {k.lower()}" for k, n in kinds.items()) + ".")
-    return Answer(text, "answered", "High", [rid] + [lrid for lrid, _ in leave])
+    return Answer(text, "answered", "High", [rid] + org_cites + [lrid for lrid, _ in leave])
 
 
 # ---------- Day 2: people data ----------

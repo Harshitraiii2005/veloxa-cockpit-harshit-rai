@@ -209,6 +209,7 @@ def build():
     load_curated(conn, "aliases.csv", "alias", ("alias", "entity_id", "confidence", "record_id", "note"))
     load_curated(conn, "claims.csv", "claim", ("id", "metric", "value", "unit", "as_at", "record_id", "quote"))
     load_curated(conn, "verdicts.csv", "verdict", ("claim_id", "verdict", "reason", "decided_on"))
+    load_curated(conn, "org_changes.csv", "org_change", ("emp_id", "new_manager", "effective_from", "record_id", "note"))
     # verdicts.csv holds a plain date; it takes effect at that day's 10:00 IST release (A-001).
     conn.execute("UPDATE verdict SET decided_on = decided_on || 'T10:00:00+05:30'")
     conn.commit()
