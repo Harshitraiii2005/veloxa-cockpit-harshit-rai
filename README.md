@@ -2,13 +2,25 @@
 
 Ananya Rao (CEO, Veloxa Technologies) asks one question and gets a short answer. Each answer cites the records it rests on, states a confidence level, and admits when the sources disagree or don't say. It is built for the Hiyaku Systems hackathon (16–20 Nov 2026), on top of the Veloxa release packs. Veloxa is a fictional company.
 
-**Status:** Day 4. Everything below runs on all four packs. Every CEO voice note (T6a to T6d) has a written response in `responses/`.
+**Status:** Final. Code freeze is Fri 20 Nov 2026, 18:00 IST. Everything below runs on all four packs. Every CEO voice note (T6a to T6d) has a written response in `responses/`.
 
 - **Cockpit:** one question gives a short answer with a status (`answered`, `unknown`, `disagree`, `refused`), a confidence level, and the record IDs behind it.
 - **Worry list:** opens on the top three; items new since yesterday are marked NEW.
 - **Point in time:** `--as-of` (or "what did we know on <date>" in the question) limits answers to what had been released.
 - **14 agents:** interview the Engineering, Finance, People & Ops and Marketing staff. Their facts come from records; their lives are invented and logged.
 - **After 31 Oct (stretch):** a labelled, rate-based projection of activity.
+
+## Reviewing in 10 minutes
+
+1. `./run.sh`: the cockpit opens on today's top three worries. Try a question, then `@sneha what's your week like?`.
+2. `responses/`: the four CEO voice notes, each with what changed and where I pushed back.
+3. `TRANSCRIPT_NOTES.md`: the conflicts I'd defend first:
+   - TN-22: "Snehal" is a contractor, not Sneha.
+   - TN-23: Jira's 15 Dec date over "still September-ish".
+   - TN-08: the February payroll.
+   - TN-26: "nobody is overloaded" vs the work data.
+4. Point in time: ask "When is Atlas GA?" with `--as-of` 2026-11-17, 2026-11-18 and 2026-11-19, and watch the answer change only when new material is released.
+5. `./run.sh test`: 46 questions plus unit checks.
 
 ## One command
 
