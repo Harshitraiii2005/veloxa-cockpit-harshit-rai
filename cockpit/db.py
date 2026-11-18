@@ -51,7 +51,7 @@ CREATE TABLE claim (            -- a number or fact a source states, copied as s
 );
 CREATE TABLE verdict (          -- my call on a claim that disagrees (curation/verdicts.csv)
   claim_id TEXT NOT NULL REFERENCES claim(id),
-  verdict TEXT NOT NULL,        -- misheard | wrong | different-measure | accepted
+  verdict TEXT NOT NULL,        -- misheard | wrong | different-measure | cannot-settle (stays a disagreement)
   reason TEXT NOT NULL,         -- points to a TRANSCRIPT_NOTES entry (TN-xx)
   decided_on TEXT NOT NULL      -- release date of the newest evidence the verdict relies on
 );

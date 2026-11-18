@@ -6,7 +6,7 @@ import json
 import re
 from collections import Counter
 
-from .answer import Answer, day, find_person, rows
+from .answer import Answer, commits, day, duty_facts, find_person, jira_points, rows
 from .db import ROOT, connect
 
 PERSONAS = json.loads((ROOT / "curation" / "people.json").read_text())
@@ -86,6 +86,16 @@ def work_facts(conn, eid, p, people):
         if mail in d["From"]:
             to = d["To"].split("<")[0].strip()
             yield f"On {day(e['occurred_at'])} I emailed {to}: \"{d['Subject']}\".", [e["id"]]
+    pts = jira_points(conn).get(eid)
+    if pts:
+        yield (f"In Jira I have {pts['open']} story points open and {pts['done']} done on Atlas.",
+               ["JIRA:title"] + pts["open_ids"][:3])
+    total, late_after, _, late_ids, last = commits(conn, eid)
+    if total:
+        yield (f"I've made {total} commits since Nov 2025" + (f", {late_after} of them after 10 pm since June" if late_after else "") + ".",
+               [last] + late_ids[-1:])
+    for sentence, refs in duty_facts(conn, eid):
+        yield sentence.replace("On the", "I've been on the").replace("Responded", "I've responded"), refs
     # Who processed payroll / entered the GL is recorded by initials (FS, KS); use them only if unique.
     initials = Counter("".join(w[0] for w in q["Full Name"].split()) for _, q in people.values())
     mine = "".join(w[0] for w in p["Full Name"].split())

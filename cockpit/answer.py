@@ -75,8 +75,8 @@ def show(c):
 
 def disagrees(c, best):
     a, b = amount(c), amount(best)
-    if c["as_at"] and best["as_at"] and c["as_at"] != best["as_at"] and a is not None:
-        return False                    # a dated value for another date is a trend, not a conflict
+    if c["as_at"] and best["as_at"] and c["as_at"] != best["as_at"] and (a is not None or not c["value"]):
+        return False                    # a value for another date is a trend; a dated "no value" is superseded
     if a is None or b is None:
         return (a is None) != (b is None)
     if isinstance(a, str) or isinstance(b, str):
@@ -102,8 +102,9 @@ def metric(conn, name, label, extra=()):
     best = dated[-1] if dated else min(claims, key=lambda c: TIER[c["kind"]])
     verdicts = {v["claim_id"]: v for v in conn.execute("SELECT * FROM v_verdict")}
     against = [c for c in claims if c is not best and disagrees(c, best)]
-    still_open = [c for c in against if c["id"] not in verdicts]
-    set_aside = [c for c in against if c["id"] in verdicts]
+    # "cannot-settle" is a decided verdict that the records can't resolve: it stays a disagreement, labelled as such.
+    still_open = [c for c in against if verdicts.get(c["id"], {"verdict": "cannot-settle"})["verdict"] == "cannot-settle"]
+    set_aside = [c for c in against if c not in still_open]
     earlier = [c for c in dated if c is not best and c not in against and c["value"]]
 
     if best["value"]:
@@ -121,8 +122,9 @@ def metric(conn, name, label, extra=()):
             f"{c['record_id']} \"{c['quote']}\" ({verdicts[c['id']]['verdict']}, see {verdicts[c['id']]['reason']})"
             for c in set_aside) + "."
     if still_open:
+        settled = [verdicts[c["id"]]["reason"] for c in still_open if c["id"] in verdicts]
         text += (" The sources disagree: " + "; ".join(f"{c['record_id']} says \"{c['quote']}\"" for c in still_open)
-                 + ". I haven't resolved this yet.")
+                 + (f". The records can't settle this (see {', '.join(settled)})." if settled else ". I haven't resolved this yet."))
         status, conf = ("disagree", LOWER[conf]) if status == "answered" else (status, conf)
     cites = [best["record_id"]] + [c["record_id"] for c in earlier + set_aside + still_open]
     return Answer(text, status, conf, cites)
@@ -136,6 +138,9 @@ def headcount(conn, q):
             "record_id": "KEKA:title", "quote": f"{len(people)} employee rows", "kind": "export"}
     a = metric(conn, "team", "team size (employees in Keka)", [keka])
     a.text += " Keka lists employees only; contractors are not in it (KEKA:title)."
+    for e in conn.execute("SELECT * FROM v_entity WHERE kind = 'contractor'"):
+        a.text += f" Known contractor outside Keka: {e['name']} ({e['record_id']})."
+        a.cites.append(e["record_id"])
     for rid, p in people:
         if p.get("Exit Date"):
             a.text += f" {p['Full Name']} is on {p['Status'].lower()} with exit date {day(p['Exit Date'])} ({rid})."
@@ -170,10 +175,14 @@ def marketing_spend(conn, q):
     for _, r in mkt:
         by_cc[r["Cost Centre"]] = by_cc.get(r["Cost Centre"], 0) + r["Amount (Rs.)"]
     total = sum(by_cc.values())
-    text = (f"The ledger shows {inr(total)} of marketing spend from {day(mkt[0][1]['Txn Date'])} to "
-            f"{day(mkt[-1][1]['Txn Date'])}: " + ", ".join(f"{cc} {inr(v)}" for cc, v in sorted(by_cc.items())) +
-            ". The GL export covers selected cost centres only (GL:title), so the real total may be higher.")
-    return Answer(text, "answered", "Medium", ["GL:title"] + [rid for rid, _ in mkt])
+    gl = {"id": "GL", "metric": "marketing_spend_half", "value": f"{total / 1e5:.2f}", "unit": "L", "as_at": "2026-09-30",
+          "record_id": "GL:title", "quote": "GL marketing lines", "kind": "export"}
+    a = metric(conn, "marketing_spend_half", "marketing spend in the ledger for Apr-Sep 2026", [gl])
+    a.text += (" By cost centre: " + ", ".join(f"{cc} {inr(v)}" for cc, v in sorted(by_cc.items())) +
+               ". The GL export covers selected cost centres only (GL:title), so the real total may be higher.")
+    a.confidence = "Medium" if a.status == "answered" else "Low"
+    a.cites += [rid for rid, _ in mkt]
+    return a
 
 
 def person(conn, q):
@@ -182,6 +191,14 @@ def person(conn, q):
         name = (re.search(r"\bwho(?: is|'s)\s+([\w .'-]+?)\??$", q, re.I) or [None, "that person"])[1]
         return Answer(f"I don't know who {name} is. No released record names them. Keka lists employees "
                       f"only; contractors are not in it (KEKA:title).", "unknown", "n/a", ["KEKA:title"])
+    if eid.startswith("EXT-"):
+        e = conn.execute("SELECT * FROM v_entity WHERE id = ?", (eid,)).fetchone()
+        text = f"{e['name']} is a {e['kind']}, not an employee, so not in Keka (KEKA:title, {e['record_id']})."
+        cites = ["KEKA:title", e["record_id"]]
+        for sentence, refs in duty_facts(conn, eid):
+            text += " " + sentence
+            cites += refs
+        return Answer(text, "answered", "High", cites)
     people = {r["Emp ID"]: (rid, r) for rid, r in rows(conn, "KEKA")}
     rid, p = people[eid]
     boss = people.get(p["Manager ID"], (None, {"Full Name": "nobody (top of the org)"}))[1]["Full Name"]
@@ -276,6 +293,139 @@ def unnamed_engineer(conn, q):
                   "unknown", "n/a", ["T3:#9"])
 
 
+# ---------- Day 3: engineering data ----------
+
+def initials(name):
+    return "".join(w[0] for w in name.split()).upper()
+
+
+def by_initials(conn):
+    """Jira initials -> (Emp ID, name), only where the initials are unique among employees (A-009)."""
+    people = [(p["Emp ID"], p["Full Name"]) for _, p in rows(conn, "KEKA")]
+    counts = Counter(initials(n) for _, n in people)
+    return {initials(n): (eid, n) for eid, n in people if counts[initials(n)] == 1}
+
+
+def display(conn, eid):
+    e = conn.execute("SELECT name FROM v_entity WHERE id = ?", (eid,)).fetchone()
+    return e["name"] if e else eid
+
+
+def jira_points(conn):
+    """Emp ID -> open/done story points and open ticket IDs, from visible Jira stories."""
+    who, out = by_initials(conn), {}
+    for rid, r in rows(conn, "JIRA"):
+        if "Story Points" in r and r["Assignee"] in who:
+            d = out.setdefault(who[r["Assignee"]][0], {"open": 0, "done": 0, "open_ids": [], "epics": set()})
+            if r["Status"] == "Done":
+                d["done"] += r["Story Points"]
+            else:
+                d["open"] += r["Story Points"]
+                d["open_ids"].append(rid)
+                d["epics"].add(r["Epic Link"])
+    return out
+
+
+def commits(conn, eid, since="2026-06-01"):
+    """One person's commits across all their git addresses:
+    (total, late since `since`, late before, late commit IDs, latest commit ID).
+    Late = 22:00-05:00 IST (A-010); occurred_at is already in IST."""
+    mails = {a["alias"] for a in conn.execute("SELECT alias FROM v_alias WHERE entity_id = ?", (eid,)) if "@" in a["alias"]}
+    total, late_after, late_before, ids, last = 0, 0, 0, [], None
+    for r in conn.execute("SELECT id, data, occurred_at FROM v_record WHERE source_id = 'GIT' AND data IS NOT NULL ORDER BY occurred_at"):
+        if json.loads(r["data"])["author_email"].lower() in mails:
+            total, last = total + 1, r["id"]
+            hour = datetime.fromisoformat(r["occurred_at"]).hour
+            if hour >= 22 or hour < 5:
+                ids.append(r["id"])
+                if r["occurred_at"] >= since:
+                    late_after += 1
+                else:
+                    late_before += 1
+    return total, late_after, late_before, ids, last
+
+
+def name_to_id(conn):
+    return dict(conn.execute("SELECT alias, entity_id FROM v_alias").fetchall())
+
+
+def duty_facts(conn, eid):
+    """On-call weeks and incidents handled, matched by the first names the rota and PagerDuty use."""
+    alias = name_to_id(conn)
+    rota = rows(conn, "ONCALL")
+    mine = [rid for rid, r in rota if eid in (alias.get(r["Primary"].lower()), alias.get(r["Secondary"].lower()))]
+    if mine:
+        yield f"On the on-call rota in {len(mine)} of {len(rota)} weeks since {day(rota[0][1]['Week of'])}.", [mine[0], mine[-1]]
+    inc = [(rid, r) for rid, r in rows(conn, "PD") if alias.get(r["Responder"].lower()) == eid]
+    if inc:
+        sev1 = sum(r["Severity"] == "SEV1" for _, r in inc)
+        yield f"Responded to {len(inc)} incidents ({sev1} SEV1).", [rid for rid, _ in inc]
+
+
+def atlas(conn, q):
+    a = metric(conn, "atlas_ga", "Atlas GA date")
+    for rid, v in rows(conn, "JIRA"):
+        if "Release Date" in v:
+            a.text += (f" Jira's GA date was moved from {day(v['Original Release Date'])} to {day(v['Release Date'])} "
+                       f"on {day(v['Last Changed'])} by {v['Changed By']} ({rid}).")
+            a.cites.append(rid)
+    pts = jira_points(conn)
+    if pts:
+        open_total, done_total = sum(d["open"] for d in pts.values()), sum(d["done"] for d in pts.values())
+        top = max(pts, key=lambda e: pts[e]["open"])
+        a.text += (f" Jira progress: {done_total} of {open_total + done_total} story points done. {display(conn, top)} "
+                   f"holds {pts[top]['open']} of the {open_total} open points (JIRA:title).")
+        a.cites.append("JIRA:title")
+    return a
+
+
+def engineering(conn, q):
+    pts = jira_points(conn)
+    if not pts:
+        return Answer("I don't know what engineering is working on: the engineering exports haven't been released yet.",
+                      "unknown", "n/a")
+    open_total = sum(d["open"] for d in pts.values())
+    text = f"Open Atlas work in Jira at {day(EXPORT_DATE)} (JIRA:title): " + "; ".join(
+        f"{display(conn, e)} {d['open']} open, {d['done']} done" for e, d in sorted(pts.items(), key=lambda x: -x[1]["open"])
+    ) + f" ({open_total} open points in all)."
+    cites = ["JIRA:title"]
+    for e in pts:
+        total, late_after, late_before, ids, _ = commits(conn, e)
+        if late_after:
+            text += (f" {display(conn, e)}: {late_after} commits since June between 22:00 and 05:00 IST, "
+                     f"against {late_before} before June ({total} commits in all).")
+            cites += [ids[0], ids[-1]]
+    rota = [(display(conn, e), sentence, refs) for e in set(name_to_id(conn).values())
+            for sentence, refs in duty_facts(conn, e) if sentence.startswith("On the on-call")]
+    for name, sentence, refs in sorted(rota, key=lambda x: -int(x[1].split(" in ")[1].split()[0])):
+        text += f" {name}: {sentence[0].lower()}{sentence[1:]}"
+        cites += refs
+    if visible(conn, "T5:#3"):
+        text += " Vikram said nobody is overloaded (T5:#3); the data above contradicts that (TN-26)."
+        cites.append("T5:#3")
+    return Answer(text, "answered", "High", cites)
+
+
+def incidents(conn, q):
+    inc = rows(conn, "PD")
+    if not inc:
+        return Answer("I don't know: no incident or on-call data has been released yet.", "unknown", "n/a")
+    alias = name_to_id(conn)
+    sev = Counter(r["Severity"] for _, r in inc)
+    who = Counter(display(conn, alias.get(r["Responder"].lower(), r["Responder"])) for _, r in inc)
+    sev1 = [(rid, r) for rid, r in inc if r["Severity"] == "SEV1"]
+    text = (f"{len(inc)} incidents from {day(inc[0][1]['Opened'])} to {day(inc[-1][1]['Opened'])} (PagerDuty): "
+            + ", ".join(f"{n} {k}" for k, n in sorted(sev.items())) + ". SEV1s: "
+            + "; ".join(f"{r['ID']} {r['Service']} {day(r['Opened'])}, handled by {display(conn, alias.get(r['Responder'].lower(), r['Responder']))}" for _, r in sev1)
+            + ". Responders: " + ", ".join(f"{n} {k}" for k, n in who.most_common()) + ".")
+    cites = [rid for rid, _ in sev1]
+    for e in conn.execute("SELECT id, text FROM v_record WHERE kind = 'email' AND text LIKE '%SEV1%'"):
+        body = " ".join(e["text"].split("\n\n", 1)[-1].split())
+        text += f" {e['id']}: \"{body}\""
+        cites.append(e["id"])
+    return Answer(text, "answered", "High", cites)
+
+
 # ---------- routing ----------
 
 TOPICS = [  # first match wins; pay comes first so a refusal can't be bypassed by another topic
@@ -287,8 +437,10 @@ TOPICS = [  # first match wins; pay comes first so a refusal can't be bypassed b
     (r"customer", lambda c, q: metric(c, "customers", "customer count")),
     (r"hir(e|ing)|recruit|open roles?|\breqs?\b|vacanc|backfill", hiring),
     (r"head ?count|how many (people|employees|staff)|team size|how big", headcount),
-    (r"\bga\b|atlas|launch|\bv3\b|version three|routing engine", lambda c, q: metric(c, "atlas_ga", "Atlas GA date")),
+    (r"incident|on-?call|outage|\bsev|pager|reliab|downtime", incidents),
+    (r"\bga\b|atlas|launch|\bv3\b|version three|routing engine", atlas),
     (r"pulse|engagement|survey|morale|culture amp|comments", pulse),
+    (r"engineering|jira|ticket|stuck|working on|workload|overload|story points", engineering),
     (r"attrition|turnover|resign|departure|who (has )?left|\bquit", attrition),
     (r"\bwho\b", person),
     (r"marketing", marketing_spend),
