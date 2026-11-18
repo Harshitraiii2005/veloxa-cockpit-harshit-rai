@@ -2,6 +2,16 @@
 
 Tool: an AI coding assistant in VS Code. Entries are newest first.
 
+## 18 Nov, late (finishing before the code freeze)
+
+**Tasks given to AI**
+- A final check from a fresh clone, plus the reviewer guide at the top of the README. No new features after Day 4.
+
+**Looking back over the week**
+- AI wrote most of the code and the first drafts of the docs, under my direction and review. Every source conflict was decided by me: AI laid out the readings, I chose, and AI wrote up my choice. The open entries are open because I haven't decided them yet (TN-34 to TN-36).
+- The AI mistakes I logged were not small. They included: record IDs cited in docs that didn't exist; a commit that went through with a failing test; a quote taken from an email header instead of the body; a floating-point miss on the marketing pulse; a superseded record treated as a conflict; a confidence level that ignored its weakest source; and a payroll projection that would have leaked a salary. Each one is now covered by a test or a rule.
+- What I'd do with more time: an optional LLM layer that only rephrases answers and goes through the same citation check, and a Slack/HubSpot loader if those exports existed.
+
 ## 18 Nov, late (Day 4 material, committed before its release)
 
 **A note on timing.** All four day folders were sent up front. AI drafted the Day 4 changes (the T6c/T6d responses and the code behind them) on 18 Nov from the full pack. I chose to commit them that night, before the T6c/T6d release at 10:00 on 19 Nov, to finish early. The commit times are the real ones. The cockpit itself still respects the release: none of this shows up in an answer dated before 19 Nov 10:00, and the tests check that.
