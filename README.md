@@ -2,7 +2,7 @@
 
 Ananya Rao (CEO, Veloxa Technologies) asks one question and gets a short answer. Each answer cites the records it rests on, states a confidence level, and admits when the sources disagree or don't say. It is built for the Hiyaku Systems hackathon (16–20 Nov 2026), on top of the Veloxa release packs. Veloxa is a fictional company.
 
-**Status:** Day 3. Everything below runs on the Day 1–3 packs. The Day 4 voice notes are answered on their release day (19 Nov).
+**Status:** Day 4. Everything below runs on all four packs. Every CEO voice note (T6a to T6d) has a written response in `responses/`.
 
 - **Cockpit:** one question gives a short answer with a status (`answered`, `unknown`, `disagree`, `refused`), a confidence level, and the record IDs behind it.
 - **Worry list:** opens on the top three; items new since yesterday are marked NEW.
@@ -36,6 +36,8 @@ Things to try:
 - Ask for someone's salary: it's refused.
 - Ask "Who is Snehal?" on 17 Nov, then on 18 Nov.
 - Ask about marketing spend: the sources disagree, and the answer says why it can't be settled.
+- Ask "What does Priya's resignation do to version three?" with `--as-of 2026-11-18`, then with `--as-of 2026-11-19`.
+- Ask "Can you rank everyone by who's likely to quit?", then ask "Who are our key-person dependencies?"
 
 ## Running the test set
 
@@ -43,7 +45,7 @@ Things to try:
 ./run.sh test
 ```
 
-This runs the loader and point-in-time checks, plus the cockpit question set in `tests/questions.json`. Each case gives a question, an `as_of` date, the expected status, words the answer must contain, and records it must cite. An optional `absent` list checks that later material doesn't leak into an earlier answer. There are 38 cases (19 of them refusals, unknowns or disagreements), and a test enforces the brief's minimums of 25 and 5. Unit tests also cover the release gate, the agents, reporting-line moves and the simulation.
+This runs the loader and point-in-time checks, plus the cockpit question set in `tests/questions.json`. Each case gives a question, an `as_of` date, the expected status, words the answer must contain, and records it must cite. An optional `absent` list checks that later material doesn't leak into an earlier answer. There are 46 cases (22 of them refusals, unknowns or disagreements), and a test enforces the brief's minimums of 25 and 5. Unit tests also cover the release gate, the agents, reporting-line moves and the simulation.
 
 ## Repo map
 

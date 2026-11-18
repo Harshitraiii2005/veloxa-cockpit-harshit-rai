@@ -1,6 +1,6 @@
 # Architecture
 
-Status: v3, Wed 18 Nov 2026 (Day 3). v1 was committed on Day 1. "Changed since v1" at the end lists what moved and why, and git has the full history.
+Status: v4, Thu 19 Nov 2026 (Day 4). v1 was committed on Day 1. "Changed since v1" at the end lists what moved and why, and git has the full history.
 
 ## Goal in one line
 
@@ -66,6 +66,7 @@ There is **no LLM layer**. v1 planned an optional one; I dropped it (see D-002 a
 - lookalike vendors within one cost centre
 - leavers, and the work they own
 - leaders' figures that don't match the records
+- *(19 Nov)* a reported resignation by the person holding most of the open work, which raises the load rule to 5/5
 
 ## The 14 people as agents
 
@@ -73,7 +74,11 @@ The 14 are fixed by Emp ID: the persona file `curation/people.json`, matching A-
 - **grounded facts** computed at `as_of`: role, manager (effective-dated), reports, reqs, emails, leave, Jira points, commits, on-call weeks and incidents;
 - **persona lines** (work, life, mood, leave note), each cited by one assumption ID (A-103 to A-118).
 
-Pay is refused. Quitting is discussed only when a record shows a resignation. "What did you do this week?" answers from the simulation and says so. There is no free-running memory (D-005), and no LLM (D-008).
+Pay is refused. Quitting is discussed only when a record shows a resignation (a Keka exit date, or since 19 Nov a resignation reported by the CEO and shown as reported, A-016). "What did you do this week?" answers from the simulation and says so. There is no free-running memory (D-005), and no LLM (D-008).
+
+## Day 4: resignations and dependencies (T6c, T6d)
+
+A resignation reported only in a voice note is a claim (`resigned:VX007`, `notice:VX007`). It is shown as "reported" with the notice "unconfirmed", next to Keka's 31 Oct "Active". The Atlas answer adds its impact: open points held, share of atlas-engine commits, and the rest of the team's pace. It gives no new GA date. Instead of a quit ranking (refused, D-011), `dependencies()` lists where the work rests on one person: 40% or more of open Jira points, 60% or more of a repo's commits, 90% or more of on-call weeks, 90% or more of ledger entries.
 
 ## Reporting lines (T6b)
 
@@ -86,7 +91,7 @@ Pay is refused. Quitting is discussed only when a record shows a resignation. "W
 ## Tests
 
 `./run.sh test` runs everything with the stdlib `unittest`:
-- 38 question cases in `tests/questions.json`. Each has an `as_of`, an expected status, words the answer must contain, records it must cite, and an optional `absent` list that catches later facts leaking into earlier answers. 19 of the cases are refusals, unknowns or disagreements, and a test enforces the brief's minimums of 25 and 5.
+- 46 question cases in `tests/questions.json`. Each has an `as_of`, an expected status, words the answer must contain, records it must cite, and an optional `absent` list that catches later facts leaking into earlier answers. 22 of the cases are refusals, unknowns or disagreements, and a test enforces the brief's minimums of 25 and 5.
 - unit checks for the release gate, docs citing only real record IDs, the agents, reporting lines, and the simulation.
 
 ## Stack and why

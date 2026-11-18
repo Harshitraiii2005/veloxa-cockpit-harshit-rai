@@ -2,6 +2,18 @@
 
 Tool: an AI coding assistant in VS Code. Entries are newest first.
 
+## 18 Nov, late (Day 4 material, committed before its release)
+
+**A note on timing.** All four day folders were sent up front. AI drafted the Day 4 changes (the T6c/T6d responses and the code behind them) on 18 Nov from the full pack. I chose to commit them that night, before the T6c/T6d release at 10:00 on 19 Nov, to finish early. The commit times are the real ones. The cockpit itself still respects the release: none of this shows up in an answer dated before 19 Nov 10:00, and the tests check that.
+
+**Tasks given to AI**
+- T6d: work out what Priya's resignation does to Atlas, from Jira, git and the hiring tracker. Show the resignation as reported, not as a Keka fact (A-016).
+- T6c: build the key-person dependency view as the alternative to a quit ranking (D-011). The pushback itself was my call.
+- Record the TN-34 to TN-36 evidence. Those conclusions are mine to write.
+
+**Where it was wrong / what I changed**
+- Its first T6d answer kept "High" confidence while resting the resignation on a voice note. I lowered it to Medium whenever the resignation is part of the answer.
+
 ## 18 Nov (Day 3)
 
 **Tasks given to AI**
