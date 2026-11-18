@@ -24,5 +24,17 @@
   {"q": "What is our attrition rate?", "as_of": "2026-11-17", "status": "unknown", "contains": ["about twelve", "current employees only"], "cites": ["T3:#3", "KEKA:title"]},
   {"q": "What is our attrition rate?", "as_of": "2026-11-16", "status": "unknown", "contains": ["current employees only"], "cites": ["KEKA:title"], "absent": ["twelve"]},
   {"q": "Which engineer is Deepa worried about?", "as_of": "2026-11-17", "status": "unknown", "contains": ["Nobody has been named"], "cites": ["T3:#9"]},
-  {"q": "Who is P. Nair?", "as_of": "2026-11-17", "status": "answered", "contains": ["Priya Nair", "3.5 days"], "cites": ["KEKA:VX007", "LEAVE:2026-09-03"]}
+  {"q": "Who is P. Nair?", "as_of": "2026-11-17", "status": "answered", "contains": ["Priya Nair", "3.5 days"], "cites": ["KEKA:VX007", "LEAVE:2026-09-03"]},
+  {"q": "When is Atlas GA?", "as_of": "2026-11-18", "status": "answered", "contains": ["15 Dec 2026", "wrong, see TN-23", "different-measure, see TN-07"], "cites": ["JIRA:Atlas_GA", "T5:#3", "T1:#3"]},
+  {"q": "When is Atlas GA?", "as_of": "2026-11-17", "status": "unknown", "contains": ["I don't know the current Atlas GA date"], "cites": ["BOARD-JULSEP"], "absent": ["15 Dec", "JIRA"]},
+  {"q": "What did we know on 17 Nov 2026 about the Atlas GA date?", "as_of": null, "status": "unknown", "contains": ["I don't know"], "cites": [], "absent": ["15 Dec"]},
+  {"q": "Who is Snehal?", "as_of": "2026-11-18", "status": "answered", "contains": ["contractor", "S. Patil", "11 of 17 weeks"], "cites": ["INV-PIS114", "KEKA:title"]},
+  {"q": "Is engineering overloaded?", "as_of": "2026-11-18", "status": "answered", "contains": ["Priya Nair 62 open", "17 of 17 weeks", "TN-26"], "cites": ["JIRA:title", "T5:#3"]},
+  {"q": "Is engineering overloaded?", "as_of": "2026-11-17", "status": "unknown", "contains": ["haven't been released"], "cites": [], "absent": ["62"]},
+  {"q": "How are incidents and on-call?", "as_of": "2026-11-18", "status": "answered", "contains": ["3 SEV1", "handled by Sneha Kulkarni"], "cites": ["PD:INC-201", "EML-08"]},
+  {"q": "How much have we spent on marketing?", "as_of": "2026-11-18", "status": "disagree", "contains": ["14.27 L", "can't settle", "TN-27"], "cites": ["GL:title", "T4:#3"]},
+  {"q": "How many people work here?", "as_of": "2026-11-18", "status": "answered", "contains": ["19", "S. Patil"], "cites": ["KEKA:title", "INV-PIS114"]},
+  {"q": "Who is Ayesha?", "as_of": "2026-11-18", "status": "answered", "contains": ["Aisha Khan", "Performance Marketing Manager"], "cites": ["KEKA:VX011"]},
+  {"q": "Who is Nikhil?", "as_of": "2026-11-18", "status": "answered", "contains": ["reporting to Ananya Rao", "no date set yet"], "cites": ["T6b:#2"]},
+  {"q": "What is Sneha's salary?", "as_of": "2026-11-18", "status": "refused", "contains": ["can't share"], "cites": ["T2:#6"]}
 ]
