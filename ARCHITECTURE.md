@@ -1,6 +1,6 @@
 # Architecture
 
-Status: v1, Mon 16 Nov 2026 (Day 1). I'll update this file as the design changes. The history of each change is in git.
+Status: v3, Wed 18 Nov 2026 (Day 3). v1 was committed on Day 1. "Changed since v1" at the end lists what moved and why, and git has the full history.
 
 ## Goal in one line
 
@@ -9,85 +9,101 @@ Ananya asks one question and gets a short, true answer. The answer cites the rec
 ## Shape
 
 ```
-Veloxa_Hackathon_Release_Packs/      raw material, never edited
+Veloxa_Hackathon_Release_Packs/      raw material, never edited, not committed (D-007)
         │
         ▼  cockpit/load.py            one parser per file type (xlsx, csv, eml, pdf, docx, txt)
-┌──────────────────────── veloxa.db (SQLite, rebuilt from scratch on every setup) ─────┐
-│ source    file, kind, system, released_at, reliability tier                          │
-│ record    one atomic item (xlsx row, email, transcript bullet, PDF doc) + raw JSON   │
-│ entity    people, contractors, vendors, projects (canonical IDs)                      │
-│ alias     every spelling seen  ->  entity  (+ confidence, evidence)                  │
-│ claim     subject / metric / period / value, pointing at a record                    │
-│ verdict   my call on a claim that disagrees  ->  TRANSCRIPT_NOTES entry              │
-└──────────────────────────────────────────────────────────────────────────────────────┘
+┌──────────── veloxa.db (SQLite, rebuilt from scratch on every run) ─────────────────────┐
+│ source      file, kind (export/document/email/transcript/voice_note), released_at      │
+│ record      one item: a sheet row, an email, a transcript paragraph, a PDF             │
+│ entity      people (Keka Emp ID) and contractors (EXT-*)                               │
+│ alias       every spelling seen -> entity, with confidence and evidence                │
+│ claim       a number or date a source states, copied as stated   (curation/claims.csv) │
+│ verdict     my call on a conflicting claim -> a TN-xx entry      (curation/verdicts.csv)│
+│ org_change  dated reporting-line moves (T6b)                     (curation/org_changes)│
+└──────────────────────────────────────────────────────────────────────────────────────────┘
         ▲                         ▲
-        │ curation/*.csv          │  every read goes through visible(as_of)
-        │ (hand-written:          │
-        │  aliases, transcript    ├── cockpit/answer.py   question -> handler -> Answer
-        │  claims, verdicts)      ├── cockpit/worry.py    ranked "what should I worry about"
-        │                         ├── cockpit/agents.py   14 people, grounded + invented persona
-        │                         └── cockpit/cli.py, web page (stdlib http.server)
-                                  tests/  25+ questions with expected answers, one command
+        │ curation/               │  every read goes through connect(as_of) -> v_* views
+        │ (my judgements,         │
+        │  in reviewable CSV/JSON)├── cockpit/answer.py    question -> topic handler -> Answer
+        │                         ├── cockpit/worry.py     ranked worries, top 3 on open (T6a)
+        │                         ├── cockpit/agents.py    the 14 people (records + persona)
+        │                         ├── cockpit/simulate.py  projected activity after 31 Oct (stretch)
+        │                         └── cockpit/__main__.py  CLI: ask, worry, agent, simulate, prompt
+                                  tests/  questions.json (38 cases) + unit checks, ./run.sh test
 ```
 
 ## Data model
 
-**Sources and records.** Every file in the four day folders is a `source`. Each source has a `released_at` set from its folder: Day 1 = 16 Nov, Day 2 = 17 Nov, Day 3 = 18 Nov, Day 4 = 19 Nov, all at 10:00 IST. Each source is split into `record`s: one per spreadsheet row, email, transcript bullet or PDF document. A record ID is what the cockpit cites, so I keep it readable: `GL:JV-0846`, `KEKA:VX013`, `PAYROLL:r39`, `EML-08`, `T2:#4`, `BOARD-APRJUN`.
+**Sources and records.** Every file in the four day folders is a `source`. Its `released_at` comes from its folder: 16, 17, 18 and 19 Nov, each at 10:00 IST (A-001). Each source is split into `record`s, and a record ID is what answers cite, so IDs are readable: `GL:JV-0846`, `KEKA:VX013`, `JIRA:Atlas_GA`, `EML-08`, `T2:#4`, `BOARD-APRJUN`. A spreadsheet row is keyed by the first column whose values are all unique, or by row number if there isn't one. The email printout PDF is skipped as a duplicate of the .eml files (D-009). Individual payroll rows are flagged `restricted`.
 
-**Two times on every record (bitemporal).**
-- `released_at`: when the cockpit learned it. This drives "what did we know on date X?".
-- `occurred_at`: when it happened in the company (txn date, email date, ticket created). This drives "what was the GA date on 1 Sep?".
+**Two times on every record.** `released_at` is when the cockpit learned it, and it drives "what did we know on date X?". `occurred_at` is when it happened (in IST), and it drives event questions such as late-night commits.
 
-Every query goes through `connect(as_of)` in `cockpit/db.py`. It exposes temp views (`v_record`, `v_claim`, `v_verdict`, ...) that keep only rows whose record has `released_at <= as_of`. This is the only place point-in-time is enforced, so later material can't leak through a side door. A verdict only applies from its `decided_on` release date, so a call I make on Day 3 evidence never changes a Day 1 answer.
+**One point-in-time gate.** `connect(as_of)` in `cockpit/db.py` creates temp views (`v_record`, `v_entity`, `v_alias`, `v_claim`, `v_verdict`, `v_org_change`). Each view keeps only rows whose evidence was released by `as_of`, and code never reads the base tables. A verdict also has its own `decided_on`, so a call I made with Day 3 evidence can't change a Day 2 answer.
 
-**Reliability tiers** (default trust, not a verdict): system export > formal document (board update, invoice, letter) > email > call transcript > voice note. The brief says exports are better but quirky and transcripts are often misheard. A lower tier can still win a specific conflict. When it does, the reason is written down.
+**Reliability tiers** set the default trust: export > document > email/brief > transcript > voice note. They only break ties. Who is right in a conflict is never decided in code.
 
-**Entities and aliases.** People are keyed by Keka Emp ID (`VX007`). People who aren't in Keka (contractors, for example) get `EXT-*` IDs. Vendors get `VEN-*` and projects `PRJ-*`. Every spelling seen anywhere (`Pria`, `PN`, `pnair@users.noreply.github.com`, `Kartik`, `Joho books`) is an `alias` row with confidence and evidence. This is the provided Entity_Resolution worksheet in table form. I can export it back to the xlsx for the final session.
+**Claims, conflicts and verdicts.** For each metric, the best claim is the latest dated one, with the more trusted tier winning a tie. Dated values for other dates form a trend, and an older dated record with no value counts as superseded. A claim **conflicts** with the best one when it is undated or has no usable value and differs by more than 10%. A conflict stays "the sources disagree" until I write a verdict:
+- `misheard`, `wrong` or `different-measure`: the claim is set aside, still cited, with its TN reference.
+- `cannot-settle`: the claim stays a disagreement, labelled "the records can't settle this".
 
-**Claims, conflicts and verdicts.** Numbers and dates that sources state (ARR, burn, headcount, GA date) are `claim` rows in `curation/claims.csv`. Each row is copied as stated, with the quote and the unit (`?` when no unit is given), so that what a garbled line "said" is visible in a diff. For each metric, the cockpit picks the **best** claim: the latest dated one, with the most trusted tier on a tie. Dated claims for different dates form a trend, not a conflict. A claim **conflicts** with the best one when it is undated or has no usable value, and its value differs by more than 10%. A conflicting claim is set aside only when I have written a `verdict` for it in `curation/verdicts.csv` (misheard, wrong, or a different measure), pointing at my reasoning in TRANSCRIPT_NOTES.md. Until then the cockpit says "the sources disagree". The code never decides who is right.
+**Entities and aliases.** People are keyed by Keka Emp ID. Aliases are generated from Keka (full name, email, first name and "P. Nair" form when unique), plus my accepted mappings in `curation/aliases.csv` ("Pria", "Snehal" -> the contractor, Priya's GitHub address, and so on). Jira initials are matched to Keka initials only when they're unique (A-009).
 
 ## Cockpit answers
 
-The answer path is **deterministic first**:
+There is a deterministic router of topic handlers. Each reads the views and returns `Answer(text, status, confidence, cites)`, with status `answered | unknown | disagree | refused`. Confidence comes from the tier of the evidence, and drops one level when a disagreement is still open. The topics are pay (checked first, so a refusal can't be bypassed), the unnamed engineer, ARR, burn, runway, customers, hiring, headcount, incidents/on-call, Atlas, pulse, engineering workload, attrition, people, and marketing spend. A question that matches no topic, or has no evidence on that date, gets "I don't know". "What did we know on <date>" in the question sets the date itself.
 
-1. A small router matches the question to a topic handler (headcount, ARR, burn, Atlas GA, hiring, payroll, on-call, a person, and so on).
-2. The handler queries `visible(as_of)` and returns an `Answer(text, citations, confidence, status)`, where `status` is one of `answered | unknown | disagree | refused`.
-3. Confidence comes from the evidence, not from model tone. Rough rule: High = an export confirms it with no live conflict. Medium = a single document, or a resolved conflict. Low = transcript only.
-4. If no handler matches or there is no evidence, the answer is "I don't know", plus what record would settle it.
-
-**Optional LLM layer** (only if `LLM_API_KEY` is set): for questions no handler covers, the LLM gets the visible records that match and must answer only from them, citing record IDs. I check every cited ID against `visible(as_of)`. If an ID doesn't exist or comes from the future, the answer is discarded and the cockpit says "I don't know". The tests and the one-command run never need a key.
-
-**Refusals** (full list in DECISIONS.md). The cockpit refuses individual salaries; the CFO says only totals may reach Ananya (T2). It refuses survey comments for teams under the anonymity threshold. It refuses anything not in the data room, rather than guessing.
+There is **no LLM layer**. v1 planned an optional one; I dropped it (see D-002 and D-008) because every answer has to be testable and run without a key.
 
 ## "What should I worry about"
 
-`worry.py` is a list of plain rule functions. Each one looks at visible records and returns `(title, severity 1–5, confidence, evidence IDs)`. Examples: a slipped launch date, single-person dependency, payroll anomalies, spend vs freeze contradictions, on-call load. Items are ranked by severity × confidence. Each item cites its records, and a rule with no evidence on that date returns nothing. *(17 Nov, T6a)* The cockpit opens on the top three. Any further 5/5 items are always shown, the list is never padded to reach three, and items that weren't on the previous day's list are marked NEW (see responses/T6a.md).
+`worry.py` is a list of plain rule functions over the views. Each yields `Worry(severity, title, why, confidence, cites)`, and a rule with no evidence on a date yields nothing. Ranking is severity first, then confidence. When the cockpit opens it shows the top three. Any extra 5/5 items are always shown, the list is never padded, and items that weren't on the previous day's list are marked NEW (T6a). The rules are:
+- Atlas slipped or undated
+- one person holding 40% or more of open Atlas work
+- backend hiring paused after a recruiter advance
+- engagement drops of 0.4 or more
+- someone on call in 90% or more of weeks
+- a joiner paid for a full month
+- lookalike vendors within one cost centre
+- leavers, and the work they own
+- leaders' figures that don't match the records
 
 ## The 14 people as agents
 
-The 14 are the Keka employees in Engineering (5), Finance (3), People & Ops (3) and Marketing (3), which matches the brief's "14 people across engineering, finance, HR and marketing". Each agent has two layers:
+The 14 are fixed by Emp ID: the persona file `curation/people.json`, matching A-002. They are not fixed by department, so moving people around (T6b) never drops an agent. An answer is built fresh each time from:
+- **grounded facts** computed at `as_of`: role, manager (effective-dated), reports, reqs, emails, leave, Jira points, commits, on-call weeks and incidents;
+- **persona lines** (work, life, mood, leave note), each cited by one assumption ID (A-103 to A-118).
 
-- **Grounded facts**, computed from records at `as_of`: role, manager, tickets, commits, incidents, leave, emails. These are never stored by hand, so they can't drift from the data.
-- **Persona** in `curation/people.json`: how they describe their work, their life outside work, their mood, and a note on their leave. Each person's persona carries one assumption ID (`A-1` + their Emp ID number) that points to ASSUMPTIONS.md.
+Pay is refused. Quitting is discussed only when a record shows a resignation. "What did you do this week?" answers from the simulation and says so. There is no free-running memory (D-005), and no LLM (D-008).
 
-Agent memory is the set of visible records that mention them plus their persona. No free-running memory, so an agent can't "remember" something the record contradicts. *(17 Nov)* Agents are offline only (D-008). `python -m cockpit agent NAME "question"`, or `@name question` at the prompt, routes the question to work, leave, life, mood, pay (refused) or quitting (answered only if a record shows a resignation). Anything else gets "I'd rather not guess".
+## Reporting lines (T6b)
 
-## Point-in-time
+`org_change` rows record who moves, to whom, from when, and the source record. `manager_of()` reads the line as at the date asked about. An undated move is shown as "announced" and changes nothing. Nothing guesses a date or invents a person.
 
-`--as-of 2026-11-17` (CLI) or `?as_of=` (web) works on every question, the worry list and agents. The default is the current time, so the cockpit only "knows" the day folders released so far. Tests pin `as_of` explicitly and include cases where the right answer changes between two dates.
+## After 31 Oct (stretch)
+
+`simulate.py` is a seeded projection from measured rates: commits, the late-night share, the on-call swap, Jira pace, and recurring ledger lines (D-010, A-014). It is computed on the fly, never stored or cited, and always labelled. The Atlas answer adds a straight-line finish date at the pace since April (A-015).
 
 ## Tests
 
-`tests/questions.json` holds at least 25 cases `{question, as_of, expect_status, must_contain, must_cite}`. A stdlib runner prints a pass/fail table and returns non-zero on failure. At least 5 cases must come back `unknown`, `disagree` or `refused`.
+`./run.sh test` runs everything with the stdlib `unittest`:
+- 38 question cases in `tests/questions.json`. Each has an `as_of`, an expected status, words the answer must contain, records it must cite, and an optional `absent` list that catches later facts leaking into earlier answers. 19 of the cases are refusals, unknowns or disagreements, and a test enforces the brief's minimums of 25 and 5.
+- unit checks for the release gate, docs citing only real record IDs, the agents, reporting lines, and the simulation.
 
 ## Stack and why
 
-- **Python 3.12, SQLite (stdlib).** One file DB, rebuilt from the raw packs on every run, so there is no migration story to defend.
-- **Dependencies:** `openpyxl` (xlsx) and `pypdf` (pdf). `.eml`, `.csv` and `.docx` are parsed with the stdlib. An LLM SDK is optional.
-- **One command:** `./run.sh` creates a venv, installs requirements, builds `veloxa.db`, runs the tests, and starts the cockpit.
+- **Python 3.10+ and SQLite (stdlib).** The DB is rebuilt from the raw packs on every run, so there is nothing to migrate.
+- **Two dependencies:** `openpyxl` and `pypdf`. Email, CSV and docx are parsed with the stdlib.
+- **One command:** `./run.sh` unzips the packs if needed, creates the venv, installs, builds the DB, and opens the cockpit. `./run.sh test` runs the tests.
 
-## Known open questions (will change this doc)
+## Changed since v1 (16 Nov)
 
-- How to treat a document that copies other evidence (for example a printout of the same email threads): as duplicate evidence, or as one source?
-- Whether event-time questions before 16 Nov should answer from `occurred_at`, or say nothing was known yet. The current plan is to support both and label which one is used.
-- Simulation after 31 Oct (stretch): not designed yet.
+| What | v1 plan | Now | Why |
+|---|---|---|---|
+| Conflict handling | one "resolution" per conflict | a verdict per claim, plus `cannot-settle` | some claims are set aside for different reasons; TN-27 can't be settled |
+| LLM layer | optional, behind a key | not built | answers must be testable and keyless (D-002, D-008) |
+| Who the 14 are | department filter | fixed Emp IDs | T6b: moving people must not drop agents |
+| Reporting lines | Keka only | Keka plus dated `org_change` | T6b |
+| Email printout | open question | skipped as a duplicate | D-009 |
+| Event-time questions before 16 Nov | open question | answered "nothing released yet"; event dates are used inside answers (commit hours, GA history) | the brief defines "what did we know" by release date |
+| After 31 Oct | not designed | rate-based projection | D-010 |
+| Web page | planned | not built; the CLI opens on the top three | no requirement needed it; time went to the must-haves |

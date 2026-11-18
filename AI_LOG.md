@@ -2,6 +2,22 @@
 
 Tool: an AI coding assistant in VS Code. Entries are newest first.
 
+## 18 Nov (Day 3)
+
+**Tasks given to AI**
+- Bring in the Day 3 engineering exports and list the T4/T5 conflicts with their evidence (TN-22 to TN-33). As before, AI laid out the readings and I chose each conclusion. The calls I'd defend first are "Snehal is the contractor, not Sneha" (TN-22) and "Jira's 15 Dec beats 'September-ish'" (TN-23).
+- Build the Day 3 answers, worries and agent facts, the T6b reporting-line change and its response, and the stretch simulation.
+
+**Where it was wrong / what I changed**
+- With the Jira date in, the board's "GA moved, no date" line (6 Oct) was flagged as *disagreeing* with 15 Dec. A record that says "moved" without a date is superseded, not contradictory, so I changed the rule.
+- It wrote a muddled expression to choose which commit to cite. I made `commits()` return the latest commit ID instead.
+- Its first payroll simulation would have booked November payroll at the old amount, ignoring Siddharth's exit. Showing the corrected amount would reveal his salary by subtraction, so payroll is now projected without an amount.
+- My first simulation test expected a payroll event by 18 Nov, but payroll lands on the 28th. That was a mistake in the test, not the code, and I fixed the test.
+- It drafted a test that compared managers with a confusing string replace. I rewrote it to state the expected manager plainly.
+
+**What I decided against**
+- An LLM layer (D-002, D-008), and LLM-written "new emails" for the simulation (D-010). Both would produce text I can't test or defend.
+
 ## 17 Nov (Day 2)
 
 **Tasks given to AI**

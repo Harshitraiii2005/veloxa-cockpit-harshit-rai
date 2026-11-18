@@ -11,6 +11,7 @@ These are choices I could defend either way. Each entry says what I picked, the 
 **Picked:** topic handlers that query the DB and build the answer, with citations and confidence computed from the evidence. An LLM is used only for questions no handler covers, and only when a key is present. Its citations are checked against `visible(as_of)`.
 **Alternative:** LLM-first RAG over all records.
 **Why:** The grading cares whether answers are *true against the data room* and admit uncertainty. A handler is something I can read and test, and it gives the same answer every time. An LLM sounds confident whether or not it's right. The fresh-clone run and the test set must also work without an API key.
+*(revised 18 Nov)* The LLM layer was never built. Every topic I needed has a handler, and an unmatched question honestly gets "I don't know". Adding an LLM for the long tail would have meant answers I can't test offline.
 
 ## D-003 · Transcript claims are hand-curated, not machine-extracted (16 Nov)
 **Picked:** `curation/claims.csv`. I write one row per number or fact a transcript asserts, with the words as heard.

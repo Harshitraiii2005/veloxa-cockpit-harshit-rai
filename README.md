@@ -2,7 +2,13 @@
 
 Ananya Rao (CEO, Veloxa Technologies) asks one question and gets a short answer. Each answer cites the records it rests on, states a confidence level, and admits when the sources disagree or don't say. It is built for the Hiyaku Systems hackathon (16–20 Nov 2026), on top of the Veloxa release packs. Veloxa is a fictional company.
 
-**Status:** Day 2. The 14 people can be interviewed as agents. The loader builds `veloxa.db` from all four folders with release-date gating. The cockpit answers questions on the Day 1 and Day 2 data and opens on the top three worries (T6a). See [ARCHITECTURE.md](ARCHITECTURE.md).
+**Status:** Day 3. Everything below runs on the Day 1–3 packs. The Day 4 voice notes are answered on their release day (19 Nov).
+
+- **Cockpit:** one question gives a short answer with a status (`answered`, `unknown`, `disagree`, `refused`), a confidence level, and the record IDs behind it.
+- **Worry list:** opens on the top three; items new since yesterday are marked NEW.
+- **Point in time:** `--as-of` (or "what did we know on <date>" in the question) limits answers to what had been released.
+- **14 agents:** interview the Engineering, Finance, People & Ops and Marketing staff. Their facts come from records; their lives are invented and logged.
+- **After 31 Oct (stretch):** a labelled, rate-based projection of activity.
 
 ## One command
 
@@ -14,17 +20,22 @@ The release packs aren't committed, because they were sent as confidential (DECI
 
 ## Using it
 
-`./run.sh` opens on the top three worries (items new since the day before are marked NEW), then asks for questions. Type `more` to see every worry. You can also run one question at a time:
+`./run.sh` opens on the top three worries, then takes questions. Type `more` to see every worry, or `@name question` to talk to one of the 14 people. A blank line quits.
 
 ```bash
-.venv/bin/python -m cockpit ask "What is our ARR?"
-.venv/bin/python -m cockpit ask "When is Atlas GA?" --as-of 2026-11-16
-.venv/bin/python -m cockpit worry --as-of 2026-11-17 --all
+.venv/bin/python -m cockpit ask "When is Atlas GA?"
+.venv/bin/python -m cockpit ask "What did we know on 17 Nov 2026 about the Atlas GA date?"
+.venv/bin/python -m cockpit ask "Is engineering overloaded?" --as-of 2026-11-18
+.venv/bin/python -m cockpit worry --as-of 2026-11-18 --all
 .venv/bin/python -m cockpit agent --list
-.venv/bin/python -m cockpit agent Fatima "Tell me about your leave"
+.venv/bin/python -m cockpit agent Sneha "What's your week like?"
+.venv/bin/python -m cockpit simulate --as-of 2026-11-30
 ```
 
-You can interview any of the 14 people (Engineering, Finance, People & Ops, Marketing). Their facts come from the records, and their personal lives are invented and logged in ASSUMPTIONS.md (A-100 onwards). Every answer ends with a confidence level, a status (`answered`, `unknown`, `disagree` or `refused`) and the record IDs it used. `--as-of` limits the cockpit to what had been released by that date. A question like "what did we know on 15 Nov 2026 about ARR?" sets that date itself.
+Things to try:
+- Ask for someone's salary: it's refused.
+- Ask "Who is Snehal?" on 17 Nov, then on 18 Nov.
+- Ask about marketing spend: the sources disagree, and the answer says why it can't be settled.
 
 ## Running the test set
 
@@ -32,7 +43,7 @@ You can interview any of the 14 people (Engineering, Finance, People & Ops, Mark
 ./run.sh test
 ```
 
-This runs the loader and point-in-time checks, plus the cockpit question set in `tests/questions.json`. Each case gives a question, an `as_of` date, the expected status, words the answer must contain, and records it must cite. An optional `absent` list checks that later material doesn't leak into an earlier answer. There are 26 cases (18 of them refusals, unknowns or disagreements), and a test enforces the brief's minimums of 25 and 5.
+This runs the loader and point-in-time checks, plus the cockpit question set in `tests/questions.json`. Each case gives a question, an `as_of` date, the expected status, words the answer must contain, and records it must cite. An optional `absent` list checks that later material doesn't leak into an earlier answer. There are 38 cases (19 of them refusals, unknowns or disagreements), and a test enforces the brief's minimums of 25 and 5. Unit tests also cover the release gate, the agents, reporting-line moves and the simulation.
 
 ## Repo map
 
@@ -40,7 +51,6 @@ This runs the loader and point-in-time checks, plus the cockpit question set in 
 |---|---|
 | `Veloxa_Hackathon_Release_Packs/` | Raw material as received. Not committed (D-007); `run.sh` unzips it here. |
 | `cockpit/` | Loader, data model, cockpit, worry list, agents |
-| `curation/` | Hand-written judgements: aliases, transcript claims, resolutions |
 | `tests/` | Test questions with expected answers |
 | `ARCHITECTURE.md` | Design |
 | `DECISIONS.md` | Choices that could go either way |
@@ -48,3 +58,4 @@ This runs the loader and point-in-time checks, plus the cockpit question set in 
 | `TRANSCRIPT_NOTES.md` | Suspected mishearings and contradictions, with my conclusions |
 | `AI_LOG.md` | What AI did, where it was wrong, what I changed |
 | `responses/` | Written responses to the CEO voice notes (T6a–T6d) |
+| `curation/` | My judgements as data: claims, verdicts, aliases, contractors, reporting-line moves, the 14 personas |
