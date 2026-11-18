@@ -219,3 +219,21 @@ Status key: **open** (evidence collected, not yet decided) · **decided** · **r
 - `T4:#9`: marketing will "report into the new CRO, I hear", with no date. `T6b:#2`: "from next month. Or the month after, still finalising."
 - No CRO appears in Keka or any other record.
 - Conclusion (18 Nov): No CRO exists yet in the data. The reporting change is announced, but it has no date and no person, so the cockpit treats it as pending (responses/T6b.md).
+
+## Day 4 (released 19 Nov): T6c and T6d voice notes
+
+### TN-34 · "Pria resigned this morning", "notice period two months, I think" · open
+- `T6d:#2` is a CEO voice note. "Pria" = Priya Nair (TN-24).
+- `KEKA:VX007` still shows her as Active with no exit date, but that export is from 31 Oct, before the resignation.
+- There is no resignation letter and no HR record of her notice period in the data room. For comparison, Siddharth's letter (`RESIGN-SM`) gave about six weeks (15 Sep to 31 Oct).
+- Until I decide, the cockpit shows it as a reported resignation with the notice "unconfirmed" (A-016).
+- Conclusion:
+
+### TN-35 · "Deepa says it's fine" (T6c) vs Deepa's own positions · open
+- `T6c:#2`: the CEO says Deepa is fine with ranking people by quit risk and reading their Slack messages.
+- `EML-11`: Deepa won't share comments for a team that small. `T3:#9`: she won't name the engineer she's worried about. `T3:#3`: she wants Ananya to see survey comments (TN-17).
+- Conclusion:
+
+### TN-36 · "Slag messages" · open
+- `T6c:#2`. "Slag" was read as Slack in TN-05. The data room has no Slack export.
+- Conclusion:

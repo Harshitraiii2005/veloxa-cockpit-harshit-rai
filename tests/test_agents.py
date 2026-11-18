@@ -42,6 +42,13 @@ class Agents(unittest.TestCase):
         self.assertEqual(sid.status, "answered")
         self.assertIn("KEKA:VX013", sid.cites)
 
+    def test_a_reported_resignation_changes_the_answer_from_its_release(self):
+        before = interview("Priya", "Are you planning to quit?", "2026-11-18")
+        after = interview("Priya", "Are you planning to quit?", "2026-11-19")
+        self.assertEqual(before.status, "refused")
+        self.assertEqual(after.status, "answered")
+        self.assertIn("T6d:#2", after.cites)
+
     def test_only_the_fourteen_and_only_after_release(self):
         self.assertEqual(interview("Manoj", "How is sales?", "2026-11-17").status, "unknown")
         self.assertEqual(interview("Priya", "What are you working on?", "2026-11-15").status, "unknown")

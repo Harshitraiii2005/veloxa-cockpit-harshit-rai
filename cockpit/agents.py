@@ -6,7 +6,7 @@ import json
 import re
 from collections import Counter
 
-from .answer import Answer, commits, day, duty_facts, find_person, jira_points, manager_of, rows
+from .answer import Answer, commits, resignations, day, duty_facts, find_person, jira_points, manager_of, rows
 from .db import ROOT, connect
 
 PERSONAS = json.loads((ROOT / "curation" / "people.json").read_text())
@@ -43,6 +43,9 @@ def interview(who, question, as_of=None):
             letters = [r["id"] for r in conn.execute(
                 "SELECT id FROM v_record WHERE kind = 'document' AND text LIKE ?", (f"%{p['Full Name']}%resignation%",))]
             return Answer(f"Yes. I resigned, and my last day is {day(p['Exit Date'])}.", "answered", "High", [rid] + letters)
+        if eid in (res := resignations(conn)):
+            return Answer(f"Yes. I resigned on {day(res[eid]['date'])}. It isn't in Keka yet. I'd rather talk about the "
+                          f"handover than the reasons.", "answered", "Medium", res[eid]["cites"] + [persona["assumption"]])
         return Answer("That's not something I'd discuss here. If something were wrong, I'd raise it with my manager first.",
                       "refused", "n/a")
     if topic == "leave":

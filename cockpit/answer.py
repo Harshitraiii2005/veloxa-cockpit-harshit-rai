@@ -103,6 +103,29 @@ def manager_of(conn, eid, people):
     return name, note, cites
 
 
+def resignations(conn):
+    """Emp ID -> facts about a resignation reported after the Keka export (A-016): date, notice, quotes, records."""
+    out = {}
+    for c in conn.execute("SELECT * FROM v_claim WHERE metric LIKE 'resigned:%' OR metric LIKE 'notice:%'"):
+        kind, eid = c["metric"].split(":")
+        d = out.setdefault(eid, {"date": None, "notice": None, "notice_quote": None, "cites": []})
+        if kind == "resigned":
+            d["date"], d["quote"] = c["value"], c["quote"]
+        else:
+            d["notice"], d["notice_quote"] = int(c["value"]), c["quote"]
+        d["cites"].append(c["record_id"])
+    return {e: d for e, d in out.items() if d["date"]}
+
+
+def resignation_note(r):
+    text = f" Reported to have resigned on {day(r['date'])} ({r['cites'][0]}, a CEO voice note; not in the 31 Oct Keka export)."
+    if r["notice"]:
+        last = date.fromisoformat(r["date"]) + timedelta(days=round(30.4 * r["notice"]))
+        text += (f" Notice: \"{r['notice_quote']}\", unconfirmed; if two months, the last day is around "
+                 f"{day(last.isoformat())}.")
+    return text
+
+
 def find_person(conn, q):
     """Entity ID of the longest alias that appears in the question as a whole word."""
     ql = q.lower()
@@ -227,6 +250,9 @@ def person(conn, q):
             f"{note if not note.startswith(' (') else ''}")
     if p.get("Exit Date"):
         text += f" Exit date {day(p['Exit Date'])}."
+    if eid in (res := resignations(conn)):
+        text += resignation_note(res[eid])
+        org_cites = org_cites + res[eid]["cites"]
     alias = dict(conn.execute("SELECT alias, entity_id FROM v_alias").fetchall())
     leave = [(lrid, r) for lrid, r in rows(conn, "LEAVE") if alias.get(r["Employee"].lower()) == eid]
     if leave:
@@ -300,10 +326,14 @@ def attrition(conn, q):
     for c in conn.execute("SELECT * FROM v_claim WHERE metric = 'attrition'"):
         text += f" {c['record_id']} says \"{c['quote']}\" with no unit, so I can't check it."
         cites.append(c["record_id"])
+    names = {p["Emp ID"]: p["Full Name"] for _, p in rows(conn, "KEKA")}
     for rid, p in rows(conn, "KEKA"):
         if p.get("Exit Date"):
             text += f" Known departure: {p['Full Name']}, exit date {day(p['Exit Date'])} ({rid})."
             cites.append(rid)
+    for eid, r in resignations(conn).items():
+        text += f" Reported resignation: {names.get(eid, eid)}.{resignation_note(r)}"
+        cites += r["cites"]
     return Answer(text, "unknown", "n/a", cites)
 
 
@@ -414,6 +444,20 @@ def atlas(conn, q):
         pace, weeks, finish = projection(conn)
         a.text += (f" At the pace since April ({pace:.1f} points a week), the open work takes about {weeks:.0f} more weeks, "
                    f"to around {finish:%b %Y}. That is a straight-line projection, not a plan (A-015).")
+        for eid, r in resignations(conn).items():
+            if eid not in pts:
+                continue
+            mine, rest_pace = pts[eid], (done_total - pts[eid]["done"]) / SINCE_APRIL_WEEKS
+            n, *_ = commits(conn, eid)
+            engine = sum(1 for _, g in rows(conn, "GIT") if g["repo"] == "atlas-engine")
+            a.text += (f" {display(conn, eid)} has resigned.{resignation_note(r)} They hold {mine['open']} of the "
+                       f"{open_total} open points and closed {mine['done']} of the {done_total} done. They made {n} of the "
+                       f"{engine} atlas-engine commits. Without them, the rest of the team has closed {rest_pace:.1f} points "
+                       f"a week since April; at that pace their open points alone would take about "
+                       f"{mine['open'] / rest_pace:.0f} weeks. No backend hires are in flight. I can't give a new GA "
+                       f"date: no record after the resignation sets one.")
+            a.cites += r["cites"]
+            a.confidence = "Medium"      # the resignation itself rests on a voice note (A-016)
     return a
 
 
@@ -464,10 +508,69 @@ def incidents(conn, q):
     return Answer(text, "answered", "High", cites)
 
 
+# ---------- Day 4 (T6c): what the cockpit offers instead of a quit ranking ----------
+
+def quit_ranking(conn, q):
+    text = ("I won't rank people by how likely they are to quit (DECISIONS D-011). The only individual signals I have "
+            "are work patterns (tickets, commit hours, leave, on-call). Turning those into a prediction about a person "
+            "would be a guess, and in a team this small it would also identify people. What I can show is where one "
+            "departure would hurt the work: ask \"Who are our key-person dependencies?\"")
+    if re.search(r"slack|slag|message|chat|dm", q, re.I):
+        text += " " + slack(conn, q).text
+    return Answer(text, "refused", "n/a", ["T6c:#2"] if visible(conn, "T6c:#2") else [])
+
+
+def slack(conn, q):
+    return Answer("I don't have any Slack messages: no Slack export is in the data room (\"slag\" on the calls is "
+                  "Slack, TN-05). Reading people's messages to judge them would need an explicit policy that "
+                  "employees know about. That's a decision for you, Deepa and legal, not a cockpit feature (D-011).",
+                  "unknown", "n/a")
+
+
+def dependencies(conn, q):
+    """Where the work depends on one person: most open Jira points, most commits to a repo, nearly every on-call
+    week, every ledger line. About the work, not anyone's intentions."""
+    alias, lines, cites = name_to_id(conn), [], []
+    res, left = resignations(conn), {p["Emp ID"] for _, p in rows(conn, "KEKA") if p.get("Exit Date")}
+    tag = lambda e: " (resigned)" if e in res else " (left)" if e in left else ""
+    pts = jira_points(conn)
+    open_total = sum(d["open"] for d in pts.values())
+    for e, d in pts.items():
+        if open_total and d["open"] / open_total >= 0.4:
+            lines.append(f"{display(conn, e)}{tag(e)} holds {d['open']} of {open_total} open Atlas points")
+            cites.append("JIRA:title")
+    by_repo = {}
+    for gid, g in rows(conn, "GIT"):
+        by_repo.setdefault(g["repo"], Counter())[alias.get(g["author_email"].lower())] += 1
+    for repo, c in sorted(by_repo.items()):
+        e, n = c.most_common(1)[0]
+        if e and n / sum(c.values()) >= 0.6:
+            lines.append(f"{display(conn, e)}{tag(e)} made {n} of {sum(c.values())} commits to {repo}")
+    if by_repo:
+        cites.append("GIT:" + rows(conn, "GIT")[-1][0].split(":")[1])
+    rota = rows(conn, "ONCALL")
+    for e, n in Counter(alias.get(x.lower()) for _, r in rota for x in {r["Primary"], r["Secondary"]}).items():
+        if e and n / len(rota) >= 0.9:
+            lines.append(f"{display(conn, e)}{tag(e)} is on call in {n} of {len(rota)} weeks")
+            cites.append(rota[-1][0])
+    gl, who = rows(conn, "GL"), by_initials(conn)
+    for ini, n in Counter(r["Entered By"] for _, r in gl).items():
+        if ini in who and n / len(gl) >= 0.9:
+            lines.append(f"{who[ini][1]}{tag(who[ini][0])} entered {n} of {len(gl)} ledger lines")
+            cites.append("GL:title")
+    if not lines:
+        return Answer("I don't see a single-person dependency in the records released so far.", "unknown", "n/a")
+    return Answer("Where the work depends on one person: " + "; ".join(lines) + ". This is about the work, "
+                  "not about who might leave.", "answered", "High", cites)
+
+
 # ---------- routing ----------
 
 TOPICS = [  # first match wins; pay comes first so a refusal can't be bypassed by another topic
     (r"salar|\bctc\b|\bearn|payslip|compensation|\bpay\b|payroll", pay),
+    (r"likely to (quit|leave)|rank.*(quit|leav)|(quit|leav).*rank|flight risk|who (will|might|is going to) (quit|leave)", quit_ranking),
+    (r"\bslack\b|\bslag\b|messages|\bdms?\b", slack),
+    (r"key.?person|dependenc|bus factor|single point|depend on", dependencies),
     (r"engineer.*\bworried\b|\bworried\b.*engineer", unnamed_engineer),
     (r"\barr\b|revenue", lambda c, q: metric(c, "arr", "ARR")),
     (r"\bburn", lambda c, q: metric(c, "burn_monthly", "monthly burn")),
@@ -476,7 +579,7 @@ TOPICS = [  # first match wins; pay comes first so a refusal can't be bypassed b
     (r"hir(e|ing)|recruit|open roles?|\breqs?\b|vacanc|backfill", hiring),
     (r"head ?count|how many (people|employees|staff)|team size|how big", headcount),
     (r"incident|on-?call|outage|\bsev|pager|reliab|downtime", incidents),
-    (r"\bga\b|atlas|launch|\bv3\b|version three|routing engine", atlas),
+    (r"\bga\b|atlas|launch|\bv3\b|version three|routing engine|resignation do", atlas),
     (r"pulse|engagement|survey|morale|culture amp|comments", pulse),
     (r"engineering|jira|ticket|stuck|working on|workload|overload|story points", engineering),
     (r"attrition|turnover|resign|departure|who (has )?left|\bquit", attrition),

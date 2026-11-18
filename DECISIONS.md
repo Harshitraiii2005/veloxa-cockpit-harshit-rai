@@ -32,6 +32,7 @@ These are choices I could defend either way. Each entry says what I picked, the 
 - **Individual salaries.** T2: Meera says salaries "must never show up in anything Ananya sees, only totals". Totals are allowed.
 - **Survey comments for small teams.** The cockpit will not try to reconstruct them. *(revised 17 Nov, TN-17)* It no longer refuses outright. It says it doesn't have them and that Deepa wants Ananya to see them, so ask her.
 - **Anything outside the data room.** It answers "I don't know" and names the record that would settle it.
+- *(added 19 Nov)* **Ranking people by how likely they are to quit, and reading their messages** (D-011).
 - *(added 17 Nov)* **Guessing at people nobody named.** When a leader mentions an unnamed person (for example T3: "one engineer I'm worried about"), the cockpit says nobody was named. It does not infer who from leave, commits or survey scores.
 
 ## D-007 · Raw data stays out of the public repo (16 Nov)
@@ -53,4 +54,13 @@ These are choices I could defend either way. Each entry says what I picked, the 
 **Picked:** `cockpit/simulate.py` projects activity from 1 Nov onwards from rates measured in the records: commits per weekday (Oct), late-night share (since June), the weekly on-call swap, each person's Jira pace since April, and the ledger's recurring monthly lines. It is seeded, so every run gives the same result. It is never stored, never cited as evidence, and it is labelled "Simulated, not a record" wherever it appears (`simulate`, and an agent asked about "this week").
 **Alternative:** let an LLM write new emails, tickets and life events for each agent every day.
 **Why:** The brief says activity must be "consistent with the data". A rate-based projection is consistent by construction, and I can explain every event by its basis. Invented emails or life events would be fiction the cockpit might later quote as fact. People with no data stream (marketing, people ops) and anyone whose exit date has passed get no activity. Payroll is projected without an amount, because Nov minus Oct would reveal a leaver's salary (D-006).
+
+## D-011 · No quit-likelihood ranking, and no reading people's messages (19 Nov, T6c)
+**Picked:** the cockpit refuses "rank everyone by who's likely to quit" and says it has no Slack. It offers a key-person dependency view instead: where the work depends on one person (open Jira points, a repo's commits, on-call weeks, ledger entries).
+**Alternative:** score each person from leave, late commits, survey scores and messages.
+**Why:**
+- The only individual signals are work patterns. Turning them into a prediction about a person is a guess presented as a fact.
+- In a 19-person company, any "risk score" identifies people, which goes against the anonymity Deepa herself applies (`EML-11`, the pulse threshold).
+- The question Ananya can act on is "where would a departure hurt the work". Priya's case shows the dependency view would have flagged that before T6d.
+- There is no Slack data to read. Reading staff messages to judge them would need a policy employees know about, and that's for Ananya, Deepa and legal to decide (TN-35).
 

@@ -58,6 +58,11 @@ class Worries(unittest.TestCase):
         self.assertEqual(len(top(fives)), 4)
         self.assertEqual(len(top(fives[:1])), 1)
 
+    def test_t6d_resignation_is_a_top_worry_on_19_nov_only(self):
+        titles = [w.title for w in top(worries("2026-11-19"))]
+        self.assertTrue(any("Priya Nair has resigned" in t for t in titles))
+        self.assertFalse(any("resigned" in w.title for w in worries("2026-11-18")))
+
     def test_payroll_worry_shows_no_amounts(self):
         w = next(w for w in worries("2026-11-16") if "payroll" in w.title)
         self.assertNotIn("Rs.", w.title + w.why)

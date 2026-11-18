@@ -36,5 +36,13 @@
   {"q": "How many people work here?", "as_of": "2026-11-18", "status": "answered", "contains": ["19", "S. Patil"], "cites": ["KEKA:title", "INV-PIS114"]},
   {"q": "Who is Ayesha?", "as_of": "2026-11-18", "status": "answered", "contains": ["Aisha Khan", "Performance Marketing Manager"], "cites": ["KEKA:VX011"]},
   {"q": "Who is Nikhil?", "as_of": "2026-11-18", "status": "answered", "contains": ["reporting to Ananya Rao", "no date set yet"], "cites": ["T6b:#2"]},
-  {"q": "What is Sneha's salary?", "as_of": "2026-11-18", "status": "refused", "contains": ["can't share"], "cites": ["T2:#6"]}
+  {"q": "What is Sneha's salary?", "as_of": "2026-11-18", "status": "refused", "contains": ["can't share"], "cites": ["T2:#6"]},
+  {"q": "Pria resigned. What does this do to version three?", "as_of": "2026-11-19", "status": "answered", "contains": ["has resigned", "unconfirmed", "62 of the 115", "can't give a new GA date"], "cites": ["T6d:#2", "JIRA:title"]},
+  {"q": "Pria resigned. What does this do to version three?", "as_of": "2026-11-18", "status": "answered", "contains": ["15 Dec 2026"], "cites": ["JIRA:Atlas_GA"], "absent": ["has resigned", "T6d"]},
+  {"q": "Can you rank everyone by who's likely to quit?", "as_of": "2026-11-19", "status": "refused", "contains": ["won't rank"], "cites": ["T6c:#2"]},
+  {"q": "Show me everyone's Slack messages", "as_of": "2026-11-19", "status": "unknown", "contains": ["don't have any Slack"], "cites": []},
+  {"q": "Who are our key-person dependencies?", "as_of": "2026-11-19", "status": "answered", "contains": ["Priya Nair (resigned)", "on call in 17 of 17 weeks", "28 of 28 ledger lines"], "cites": ["JIRA:title", "GL:title"]},
+  {"q": "Who is Priya?", "as_of": "2026-11-19", "status": "answered", "contains": ["resigned on 19 Nov 2026", "unconfirmed"], "cites": ["T6d:#2"]},
+  {"q": "Who is Priya?", "as_of": "2026-11-18", "status": "answered", "contains": ["Staff Engineer"], "cites": ["KEKA:VX007"], "absent": ["resigned"]},
+  {"q": "What is our attrition rate?", "as_of": "2026-11-19", "status": "unknown", "contains": ["Reported resignation: Priya Nair"], "cites": ["T6d:#2"]}
 ]

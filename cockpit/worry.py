@@ -7,7 +7,7 @@ from datetime import date
 from difflib import SequenceMatcher
 from itertools import combinations
 
-from .answer import (atlas, commits, day, display, duty_facts, inr, jira_points, marketing_spend, metric,
+from .answer import (atlas, commits, resignation_note, resignations, day, display, duty_facts, inr, jira_points, marketing_spend, metric,
                      name_to_id, rows, visible)
 from .db import connect
 
@@ -65,7 +65,12 @@ def key_person_load(conn):
         if visible(conn, "T5:#3"):
             why += " Vikram says nobody is overloaded (T5:#3); I set that aside (TN-26)."
             cites.append("T5:#3")
-        yield Worry(4, f"{name} holds {round(100 * d['open'] / total)}% of the open Atlas work", why, "Medium", cites)
+        res = resignations(conn).get(eid)
+        if res:   # T6d: the person carrying the work has resigned
+            yield Worry(5, f"{name} has resigned and holds {round(100 * d['open'] / total)}% of the open Atlas work",
+                        resignation_note(res).strip() + " " + why, "High", cites + res["cites"])
+        else:
+            yield Worry(4, f"{name} holds {round(100 * d['open'] / total)}% of the open Atlas work", why, "Medium", cites)
 
 
 def on_call_load(conn):
