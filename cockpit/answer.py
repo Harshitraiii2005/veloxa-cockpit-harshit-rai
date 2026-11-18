@@ -4,7 +4,7 @@ import json
 import re
 from collections import Counter
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from .db import TIER, connect
 
@@ -384,6 +384,19 @@ def duty_facts(conn, eid):
         yield f"Responded to {len(inc)} incidents ({sev1} SEV1).", [rid for rid, _ in inc]
 
 
+SINCE_APRIL_WEEKS = 30.4   # 1 Apr to 31 Oct 2026: the window Jira's done points cover (A-015)
+
+
+def projection(conn):
+    """Straight-line finish date for the open Atlas work at the team's pace since April (A-015), or None."""
+    pts = jira_points(conn)
+    open_pts, done_pts = sum(d["open"] for d in pts.values()), sum(d["done"] for d in pts.values())
+    if not done_pts:
+        return None
+    pace = done_pts / SINCE_APRIL_WEEKS
+    return pace, open_pts / pace, date.fromisoformat(EXPORT_DATE) + timedelta(weeks=open_pts / pace)
+
+
 def atlas(conn, q):
     a = metric(conn, "atlas_ga", "Atlas GA date")
     for rid, v in rows(conn, "JIRA"):
@@ -398,6 +411,9 @@ def atlas(conn, q):
         a.text += (f" Jira progress: {done_total} of {open_total + done_total} story points done. {display(conn, top)} "
                    f"holds {pts[top]['open']} of the {open_total} open points (JIRA:title).")
         a.cites.append("JIRA:title")
+        pace, weeks, finish = projection(conn)
+        a.text += (f" At the pace since April ({pace:.1f} points a week), the open work takes about {weeks:.0f} more weeks, "
+                   f"to around {finish:%b %Y}. That is a straight-line projection, not a plan (A-015).")
     return a
 
 

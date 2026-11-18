@@ -48,3 +48,8 @@ These are choices I could defend either way. Each entry says what I picked, the 
 **Alternative:** load both, or load only the printout.
 **Why:** I checked the printout line by line against the .eml files: same 11 threads, same text, with times in IST. Loading both would make every email count twice as evidence. The .eml files keep full headers (Message-ID, Cc, timezone), so they are the better copy. If a later printout ever differed from its .eml, the difference itself would become a TRANSCRIPT_NOTES entry.
 
+## D-010 · Activity after 31 Oct is a labelled projection, computed on the fly (18 Nov, stretch)
+**Picked:** `cockpit/simulate.py` projects activity from 1 Nov onwards from rates measured in the records: commits per weekday (Oct), late-night share (since June), the weekly on-call swap, each person's Jira pace since April, and the ledger's recurring monthly lines. It is seeded, so every run gives the same result. It is never stored, never cited as evidence, and it is labelled "Simulated, not a record" wherever it appears (`simulate`, and an agent asked about "this week").
+**Alternative:** let an LLM write new emails, tickets and life events for each agent every day.
+**Why:** The brief says activity must be "consistent with the data". A rate-based projection is consistent by construction, and I can explain every event by its basis. Invented emails or life events would be fiction the cockpit might later quote as fact. People with no data stream (marketing, people ops) and anyone whose exit date has passed get no activity. Payroll is projected without an amount, because Nov minus Oct would reveal a leaver's salary (D-006).
+

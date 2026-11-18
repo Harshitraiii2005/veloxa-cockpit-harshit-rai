@@ -16,6 +16,7 @@ PERSONAS = json.loads((ROOT / "curation" / "people.json").read_text())
 TOPICS = [  # first match wins
     ("pay", r"salar|\bctc\b|\bearn|payslip amount|how much .*paid|\bpay\b"),
     ("quit", r"\bquit|resign|leav(e|ing) (veloxa|the company)|job.?hunt|looking (for|around)|interview(ing)? elsewhere"),
+    ("recent", r"this week|today|lately|recently|since november|last week|since the export"),
     ("leave", r"\bleave\b|time off|holiday|vacation|days off"),
     ("life", r"\blife\b|family|home|weekend|outside work|hobb|personal|married|kids|where do you live"),
     ("mood", r"how are you|feel|worr|stress|happy|enjoy|morale|tired"),
@@ -46,6 +47,15 @@ def interview(who, question, as_of=None):
                       "refused", "n/a")
     if topic == "leave":
         return leave_answer(conn, eid, persona)
+    if topic == "recent":
+        from .simulate import diary          # imported here: simulate imports this module's helpers
+        events = diary(eid, as_of)
+        if not events:
+            return Answer("I've nothing on record since the 31 Oct export, and no activity of mine has a basis to simulate.",
+                          "unknown", "n/a")
+        return Answer("Simulated, not a record (no data after 31 Oct, D-010): " + "; ".join(
+            f"{d:%a %d %b} {what}" for d, _, what, _ in events) + f". Basis: {events[0][3]}.", "answered", "Low",
+            [persona["assumption"]])
     if topic in ("life", "mood"):
         return Answer(persona[topic], "answered", "Low", [persona["assumption"]])
     if topic == "work":

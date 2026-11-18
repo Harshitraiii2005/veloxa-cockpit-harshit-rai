@@ -2,13 +2,15 @@
 python -m cockpit ask "question" [--as-of D]  one answer
 python -m cockpit worry [--as-of D] [--all]   ranked worry list (top 3 unless --all)
 python -m cockpit agent NAME "question"       interview one of the 14 people (agent --list for all)
+python -m cockpit simulate [--as-of D]        projected activity after the 31 Oct export (never evidence)
 D is YYYY-MM-DD (end of that day, IST) or YYYY-MM-DDTHH:MM; the default is now."""
 import argparse
 from datetime import datetime, timedelta
 
 from .agents import interview, roster
-from .answer import ask
-from .db import IST, to_ist
+from .answer import ask, display
+from .db import IST, connect, to_ist
+from .simulate import simulate
 from .worry import top, worries
 
 
@@ -26,7 +28,7 @@ def show_worries(as_of, everything=False):
 
 
 p = argparse.ArgumentParser(prog="cockpit")
-p.add_argument("command", nargs="?", choices=["ask", "worry", "agent"])
+p.add_argument("command", nargs="?", choices=["ask", "worry", "agent", "simulate"])
 p.add_argument("question", nargs="*")
 p.add_argument("--as-of")
 p.add_argument("--all", action="store_true", help="show every worry, not just the top 3")
@@ -37,6 +39,11 @@ if args.command == "ask":
     print(ask(" ".join(args.question), args.as_of))
 elif args.command == "worry":
     show_worries(args.as_of, args.all)
+elif args.command == "simulate":
+    conn = connect(args.as_of)
+    print("Simulated activity since the 31 Oct export. A projection, not records (D-010):")
+    for d, eid, what, basis in simulate(args.as_of):
+        print(f"{d:%a %d %b}  {display(conn, eid) if eid else '?':<26} {what}   [{basis}]")
 elif args.command == "agent":
     if args.list or not args.question:
         for eid, name, title in roster(args.as_of):
