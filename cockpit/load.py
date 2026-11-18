@@ -39,9 +39,16 @@ SHORT = {
     "Hiring_Tracker.xlsx": "HIRE",
     "Pulse_Survey.xlsx": "PULSE",
     "Resignation_Letter_SM.pdf": "RESIGN-SM",
+    "Jira_Export_ATLAS.xlsx": "JIRA",         # Day 3
+    "git_log.csv": "GIT",
+    "Incidents_Aug-Oct_2026.xlsx": "PD",
+    "OnCall_Rota.xlsx": "ONCALL",
+    "Atlas_Launch_Kit_v1.pdf": "LAUNCHKIT",
+    "Invoice_PIS-114.pdf": "INV-PIS114",
 }
 RESTRICTED = {"PAYROLL"}  # D-006: individual salaries never reach the CEO row by row
 SKIP_DIRS = {"templates"}  # blank worksheets for my own use, not evidence
+SKIP_FILES = {"Email_Printouts.pdf"}  # D-009: same 11 threads as the .eml files, checked line by line
 
 
 def plain(v):
@@ -76,7 +83,7 @@ def table_records(sid, rows, sheet=""):
     key_col = next((i for i, c in enumerate(cols) if None not in c and len(set(c)) == len(c)), None)
     for n, r in body:
         data = {h: plain(v) for h, v in zip(header, r) if h is not None}
-        key = plain(r[key_col]) if key_col is not None else f"r{n}"
+        key = str(plain(r[key_col])).replace(" ", "_") if key_col is not None else f"r{n}"
         yield f"{sid}:{key}", f"{sheet}!{n}", first_date(r), as_line(data), data
 
 
@@ -173,7 +180,7 @@ def build():
     for day, released in RELEASED.items():
         for path in sorted((PACKS / day).rglob("*")):
             parts = path.relative_to(PACKS / day).parts
-            if path.suffix not in PARSERS or SKIP_DIRS & set(parts):
+            if path.suffix not in PARSERS or SKIP_DIRS & set(parts) or path.name in SKIP_FILES:
                 continue
             sid = source_id(path)
             conn.execute("INSERT INTO source VALUES (?,?,?,?,?)",

@@ -43,3 +43,8 @@ These are choices I could defend either way. Each entry says what I picked, the 
 **Alternative:** an LLM role-plays each person, using their records as context.
 **Why:** The graders' fresh clone has no API key, and answers must be testable and stay consistent with the records. Fixed persona text can't drift and can be reviewed in a diff. The cost is that the agents are less conversational: an unmatched question gets "I'd rather not guess". If there's time, an optional LLM layer can rephrase these answers, using the same citation check as the cockpit.
 
+## D-009 · The email printout PDF is not loaded (18 Nov)
+**Picked:** skip `Email_Printouts.pdf` and load the 11 .eml files.
+**Alternative:** load both, or load only the printout.
+**Why:** I checked the printout line by line against the .eml files: same 11 threads, same text, with times in IST. Loading both would make every email count twice as evidence. The .eml files keep full headers (Message-ID, Cc, timezone), so they are the better copy. If a later printout ever differed from its .eml, the difference itself would become a TRANSCRIPT_NOTES entry.
+

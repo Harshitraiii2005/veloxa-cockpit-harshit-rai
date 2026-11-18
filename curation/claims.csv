@@ -21,3 +21,8 @@ C019,atlas_ga,,date,2026-10-06,BOARD-JULSEP,"We moved GA to absorb unplanned rel
 C020,atlas_ga,,date,,T1:#3,"promised to some customers ""by the festive season"" and she is not sure it will make it"
 C021,attrition,12,?,,T3:#3,"about twelve, which is normal for Bangalore"
 C022,open_roles,22,count,2026-04-30,T3:#6,"twenty-two open roles in April"
+C023,atlas_ga,2026-12-15,date,2026-10-31,JIRA:Atlas_GA,"Atlas GA release date 2026-12-15 (original 2026-09-15, last changed 2026-09-02 by vikram)"
+C024,atlas_ga,,date,,T5:#3,"on track, maybe a couple of weeks of buffer needed. Board date is still September-ish"
+C025,atlas_ga,2026-09-22,date,2026-07-21,LAUNCHKIT,"Launch date TBC with engineering (planned 22 Sep)"
+C026,atlas_ga,2026-09-15,date,2026-06-02,EML-04,"15 Sep GA is achievable if the two backend hires land by July"
+C027,marketing_spend_half,1.8,?,2026-09-30,T4:#3,"Total marketing spend for the half is one point eight by his numbers"

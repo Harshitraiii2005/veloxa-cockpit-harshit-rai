@@ -45,7 +45,7 @@ Status key: **open** (evidence collected, not yet decided) · **decided** · **r
 | "slag channel" | Slack | no export yet |
 - Conclusion (17 Nov): Accepted: Jeera = Jira, Joho books = Zoho Books, Kayka = Keka, Cult Amp = Culture Amp, hub sport = HubSpot, slag = Slack, Git Hub = GitHub. Each matches an export header or the README, except HubSpot and Slack, which are the obvious names; there is no export from either. Confidence: H (M for HubSpot and Slack).
 
-### TN-06 · People's names · decided (Pria open)
+### TN-06 · People's names · revised
 | Heard | Candidate | Evidence |
 |---|---|---|
 | "Pria" (T1) | VX007 Priya Nair, Staff Engineer | Keka; the only Priya |
@@ -55,6 +55,7 @@ Status key: **open** (evidence collected, not yet decided) · **decided** · **r
 | "Vicky" (T2), "check the freeze decision" | VX004 Vikram Menon? | No "Vicky" in Keka. The freeze would hit engineering hiring. Weak. |
 - *(added 17 Nov)* `LEAVE:2026-05-25`: K. Subramanian took exam leave, 25–29 May. This fits "doing his CFA".
 - *(added 17 Nov)* `EML-06`: Meera tells Vikram she is pausing two reqs, and `EML-07` is Vikram's reply. That fits "check the freeze decision with Vicky", but no record calls Vikram "Vicky".
+- Conclusion (18 Nov, revised): Pria = Priya Nair is now accepted too; see TN-24 for the new evidence.
 - Conclusion (17 Nov): Accepted: Kartik = Karthik Subramanian (VX010), Fatima Shaikh = Fatima Sheikh (VX014), and "the new boy Rahul" = Rahul Verma (VX018). Accepted with low confidence: Vicky = Vikram Menon (VX004), because the freeze being checked is the one that hit his reqs (`EML-06`, `EML-07`). Not yet accepted: Pria = Priya Nair. The accepted mappings are rows in curation/aliases.csv. What would change my mind on Vicky: any record using "Vicky" for someone else.
 
 ### TN-07 · Atlas timing: "by the festive season" vs 15 Sep GA · decided
@@ -81,9 +82,10 @@ Status key: **open** (evidence collected, not yet decided) · **decided** · **r
 - *(added 17 Nov)* `EML-06` (12 Aug): Meera writes "Pausing REQ-014 and REQ-015 until the round closes. Burn is the priority this quarter." `EML-07`: Vikram replies "Understood. We'll absorb it."
 - Conclusion (17 Nov): No conflict. The records tell one story: two backend hires were planned (`BOARD-APRJUN`), a 50% recruiter advance was paid (`GL:JV-0688`), REQ-014 and REQ-015 were opened on 18 May, and both were paused on 12 Aug "until the round closes" (`EML-06`). The worry is the money spent and the risk to Atlas, not a disagreement between sources.
 
-### TN-10 · Marketing spend "fine" vs "Nikhil's numbers never match mine" · open
+### TN-10 · Marketing spend "fine" vs "Nikhil's numbers never match mine" · decided
 - T1: CEO thinks marketing spend is "fine". T2: Meera says "Nikhil's numbers never match mine."
 - GL marketing lines, Apr–Sep: Google Ads (MKT-PS) and summit costs (MKT-EVT). The vendor names "Sapphire Events Pvt Ltd" (`GL:JV-0846`) and "Saphire Event Mgmt" (`GL:JV-0904`) are spelt differently. "Sapphire Residency Hotel" (`GL:JV-0918`) is a sales offsite.
+- Conclusion (18 Nov): Settled under TN-27. Neither figure can be proved, because the GL export is incomplete.
 - Conclusion (17 Nov): Waiting for the Day 3 marketing data (Nikhil's own numbers) before deciding.
 
 ### TN-11 · "The number by March" · decided
@@ -152,3 +154,68 @@ Status key: **open** (evidence collected, not yet decided) · **decided** · **r
 - `RESIGN-SM`: Siddharth Mehta to Nikhil Bose, dated 15 Sep 2026, last working day 31 Oct 2026. He gives "clearer launch timelines" as his reason.
 - `KEKA:VX013`: Notice period, exit date 2026-10-31. `BOARD-JULSEP`: "One planned departure in marketing." `HIRE:REQ-016`: Product Marketing Manager backfill, opened 17 Sep, 7 in the pipeline.
 - Conclusion (17 Nov): No conflict: the call, the letter, Keka, the board update and the backfill req all agree. Sid = Siddharth Mehta (VX013), added as an alias.
+
+## Day 3 (released 18 Nov): T4 Head of Marketing call, T5 VP Engineering call, T6b voice note
+
+### TN-22 · Who is "Snehal"? · decided
+- `ONCALL:2026-08-17` onwards: "Snehal" is primary or secondary in 11 of the 17 rota weeks, always in the same week as "Sneha".
+- `GL:JV-0902` (2 Sep): Patil Infra Services, "On-call support, 18-31 Aug". `INV-PIS114` (1 Oct): "On-call SRE support, S. Patil, September 2026 (monthly retainer)", with the earlier PIS-108 (18 to 31 Aug) marked settled.
+- `EML-08` (24 Aug, Sneha to Vikram): "The contractor starts on the rota this week."
+- `PD:INC-206` (27 Aug) is the first incident with responder "Snehal". All three August SEV1s (`PD:INC-201`, `PD:INC-203`, `PD:INC-205`) were handled by "Sneha".
+- `T5:#3`: the main blocker is "incidents in August that pulled Snehal off". `T5:#5`: "Snehal on SRE and on-call", with "Sneha" mentioned once later; the summary notes it is unclear whether they are the same person. `T5:#12`: postmortems owned by "Snehal".
+- `KEKA:title`: contractors are not in Keka.
+- Conclusion (18 Nov): Two people. Sneha Kulkarni (VX012) is the employee SRE. "Snehal" is the contractor S. Patil from Patil Infra Services (entity EXT-SPATIL). S. Patil joins the rota in the week of 17 Aug, the same day the GL starts paying Patil Infra for on-call. The rota puts both names in the same week, so they can't be one person. T5's "pulled Snehal off" mixes them up: the August SEV1s were all Sneha's, and her own email says she paused the Atlas perf tickets. Confidence: H. What would change my mind: a contract or Keka record giving S. Patil a different first name.
+
+### TN-23 · Atlas GA: Jira says 15 Dec, Vikram says "still September-ish" · decided
+- `JIRA:Atlas_GA`: release date 2026-12-15, originally 2026-09-15, last changed on 2026-09-02 by "vikram".
+- `BOARD-JULSEP` (6 Oct): GA moved, with no date given. `LAUNCHKIT` (21 Jul): launch "planned 22 Sep". `EML-04` (2 Jun): "15 Sep GA is achievable if the two backend hires land by July". Those hires never landed (`HIRE:REQ-014`, `HIRE:REQ-015` on hold).
+- `T5:#3`: v3 is "on track, maybe a couple of weeks of buffer needed"; the board date is "still September-ish".
+- Conclusion (18 Nov): I believe Jira's 15 Dec 2026. It is a system record, and Vikram himself moved it from 15 Sep to 15 Dec on 2 Sep. That fits the board update saying GA had moved. What he said on the call contradicts his own change, so I set that claim aside as wrong (C024). The condition in his 2 Jun email was never met. Confidence: H. What would change my mind: a Jira change after 31 Oct, or a dated plan from Vikram.
+
+### TN-24 · "Pria", revisited · decided (revises TN-06)
+- New evidence: `T5:#5` "Pria (routing lead)" and `T5:#9` "Pria has been doing late nights". `EML-04`: "Priya leads the core engine and re-routing". In Jira, "PN" owns most tickets in the core engine and re-routing epics (`JIRA:ATLAS-1`, `JIRA:ATLAS-2`).
+- Conclusion (18 Nov): Pria = Priya Nair (VX007). On Day 2 a similar-sounding name wasn't enough. Now three sources tie the role to her. Added to aliases.csv. Confidence: H.
+
+### TN-25 · Two git identities for Priya · decided
+- `GIT`: commits from priya.n@veloxa.in (425) and pnair@users.noreply.github.com (163), both only to atlas-engine. Both show the same pattern: no commits between 22:00 and 05:00 IST before June, then many afterwards.
+- Conclusion (18 Nov): The same person, committing from a personal GitHub account some of the time. Both count as Priya's. Confidence: M. What would change my mind: a GitHub org list mapping "pnair" to someone else.
+
+### TN-26 · "Nobody is overloaded" vs the work data · decided
+- `T5:#3`: "everyone's busy, that's startups". `T5:#9`: "Pria has been doing late nights but she likes it".
+- `JIRA:title` and the issues sheet: Priya (PN) holds 62 of 115 open story points (54%), including tickets in Rahul's API epic (`JIRA:ATLAS-3`) and Sneha's hardening epic (`JIRA:ATLAS-5`).
+- `GIT`: since June, 103 of Priya's 274 commits (38%, both identities) were made between 22:00 and 05:00 IST. Before June she has none, and no other engineer has any (A-010).
+- `EML-09`: Priya to Vikram at 23:47 on 1 Sep: "Can we talk about Atlas ownership sometime this week?"
+- `ONCALL`: Sneha is on the rota in all 17 weeks from 6 Jul. `PULSE:r7`: engineering engagement fell from 3.9 to 3.1.
+- Conclusion (18 Nov): The data shows overload, and I set aside Vikram's "nobody is overloaded" as wrong. Priya carries more than half the open Atlas work, including parts of other people's epics. Her late-night commits start in June, and nobody else's do. Sneha has been on call every week since July. This goes on the worry list as work patterns only; it says nothing about anyone's intentions (D-006). Confidence: M, because commit times aren't hours worked. What would change my mind: Jira reassignments, or time-off records showing the late work was compensated.
+
+### TN-27 · Marketing spend: "one point eight" vs the GL · decided (closes TN-10)
+- `T4:#3`: spend for the half was "one point eight" by Nikhil's numbers, and finance "counts things differently". `T4:#6`: ads on Google and "Linked in campaign manager". `T4:#7`: the summit "went a little over, nothing crazy".
+- The GL has marketing lines for Apr to Sep totalling Rs 14.27 L (MKT-PS 4.24 L, MKT-EVT 10.03 L). `GL:title` says it covers "selected cost centres" only, and there is no LinkedIn line. The summit appears under two similar vendor names (`GL:JV-0846`, `GL:JV-0904`).
+- `T2:#8`: "Nikhil's numbers never match mine."
+- Conclusion (18 Nov): This can't be settled. "One point eight" has no unit, and the GL export is incomplete by its own header and has no LinkedIn spend, so neither figure can show the other is wrong. The cockpit shows both and names the gap. The next step is Ayesha's campaign sheet (the T4 action item) plus a full GL.
+
+### TN-28 · Names and tools on T4 and T5 · decided
+- "Ayesha (performance)" (`T4:#5`) vs Keka's Aisha Khan, Performance Marketing Manager (`KEKA:VX011`), the only performance marketer.
+- Tools: "Jeera" = Jira (`JIRA:title`); "pager duty" = PagerDuty (the incident export header); "Con fluence" = Confluence, "Hub Spot" = HubSpot and "Linked in campaign manager" = LinkedIn Campaign Manager (no exports for these three).
+- Conclusion (18 Nov): All accepted. "Ayesha" is now an alias for VX011.
+
+### TN-29 · Summit: "best quarter ever for pipeline" vs "leads are cold" · decided
+- `T4:#3` vs `T4:#8` (Manoj, dismissed by Nikhil). `BOARD-JULSEP`: 212 registrations.
+- Conclusion (18 Nov): This can't be checked. Leads are in HubSpot, and there is no HubSpot export. Registrations are not pipeline.
+
+### TN-30 · Arjun: "remote from Pune now, reviews are slower" · decided
+- `T5:#5`. `KEKA:VX009`: Pune (remote). `EML-10`: he asks to make remote permanent.
+- Conclusion (18 Nov): This can't be checked. The git log has no review data.
+
+### TN-31 · Rahul "ramping well" · decided
+- `T5:#5`: "joined Feb, ramping well". In Jira, RV has 12 story points done and 25 open. In `GIT`, rahul.v has 237 commits (120 to atlas-api, 117 to atlas-engine), more than Sneha or Vikram.
+- Conclusion (18 Nov): The two exports disagree about his output, and I'm not concluding either way. Jira may simply not be kept up to date for his work. The cockpit shows both numbers.
+
+### TN-32 · "We asked for two backend people and finance froze it" · decided
+- `T5:#7` vs `EML-06`, `EML-07` and `HIRE:REQ-014`.
+- Conclusion (18 Nov): No conflict. It matches the records (see TN-09).
+
+### TN-33 · "The new CRO" · decided
+- `T4:#9`: marketing will "report into the new CRO, I hear", with no date. `T6b:#2`: "from next month. Or the month after, still finalising."
+- No CRO appears in Keka or any other record.
+- Conclusion (18 Nov): No CRO exists yet in the data. The reporting change is announced, but it has no date and no person, so the cockpit treats it as pending (responses/T6b.md).
