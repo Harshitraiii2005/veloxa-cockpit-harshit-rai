@@ -222,18 +222,18 @@ Status key: **open** (evidence collected, not yet decided) · **decided** · **r
 
 ## Day 4 (released 19 Nov): T6c and T6d voice notes
 
-### TN-34 · "Pria resigned this morning", "notice period two months, I think" · open
+### TN-34 · "Pria resigned this morning", "notice period two months, I think" · decided
 - `T6d:#2` is a CEO voice note. "Pria" = Priya Nair (TN-24).
 - `KEKA:VX007` still shows her as Active with no exit date, but that export is from 31 Oct, before the resignation.
 - There is no resignation letter and no HR record of her notice period in the data room. For comparison, Siddharth's letter (`RESIGN-SM`) gave about six weeks (15 Sep to 31 Oct).
 - Until I decide, the cockpit shows it as a reported resignation with the notice "unconfirmed" (A-016).
-- Conclusion:
+- Conclusion (19 Nov): Priya has resigned. The CEO heard it directly, so I treat the resignation as fact. Keka's "Active" comes from the 31 Oct export, before the resignation, so it doesn't contradict it. The notice period is different: "two months, I think" is uncertain even in the CEO's own words, and there's no letter or HR record, so it stays unconfirmed. The cockpit shows "around 19 Jan 2027 if two months". Confidence: H on the resignation, L on the notice. What would change my mind: a Keka update or letter with a different date or notice period.
 
-### TN-35 · "Deepa says it's fine" (T6c) vs Deepa's own positions · open
+### TN-35 · "Deepa says it's fine" (T6c) vs Deepa's own positions · decided
 - `T6c:#2`: the CEO says Deepa is fine with ranking people by quit risk and reading their Slack messages.
 - `EML-11`: Deepa won't share comments for a team that small. `T3:#9`: she won't name the engineer she's worried about. `T3:#3`: she wants Ananya to see survey comments (TN-17).
-- Conclusion:
+- Conclusion (19 Nov): "Deepa says it's fine" doesn't match anything Deepa has said herself. In writing she protects individuals in small teams (`EML-11`), and on her call she wouldn't name the engineer she's worried about (`T3:#9`). Her wish for Ananya to see survey comments (`T3:#3`) is about team feedback, not ranking people or reading their messages. I treat "it's fine" as second-hand and unconfirmed, and I'd ask for her position in writing. The cockpit's refusal doesn't depend on this; it stands on its own reasons (D-011). Confidence: M. What would change my mind: Deepa's own written agreement.
 
-### TN-36 · "Slag messages" · open
+### TN-36 · "Slag messages" · decided
 - `T6c:#2`. "Slag" was read as Slack in TN-05. The data room has no Slack export.
-- Conclusion:
+- Conclusion (19 Nov): "Slag" is Slack, consistent with TN-05. The data room has no Slack export, so there is nothing to show, and the cockpit says so (D-011). Confidence: H.
