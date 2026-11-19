@@ -2,6 +2,16 @@
 
 Tool: an AI coding assistant in VS Code. Entries are newest first.
 
+## 19 Nov (Day 4 released)
+
+**Tasks given to AI**
+- Lay out readings for TN-34 to TN-36. I chose each conclusion, and every transcript note is now decided.
+- Make the cockpit follow my TN-34 call: Priya's resignation is now stated as fact, with only the notice period unconfirmed (A-016 revised).
+- After the 10:00 release, check the cockpit's opening view: Priya's resignation shows as a NEW 5/5, next to the Atlas slip.
+
+**Where it was wrong / what I changed**
+- No new mistakes found today. The tests that pinned the old "reported to have resigned" wording failed as they should, and were updated along with the wording.
+
 ## 18 Nov, late (finishing before the code freeze)
 
 **Tasks given to AI**

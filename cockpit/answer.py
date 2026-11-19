@@ -104,7 +104,7 @@ def manager_of(conn, eid, people):
 
 
 def resignations(conn):
-    """Emp ID -> facts about a resignation reported after the Keka export (A-016): date, notice, quotes, records."""
+    """Emp ID -> a resignation known only from after the Keka export (A-016, TN-34): date, notice, quotes, records."""
     out = {}
     for c in conn.execute("SELECT * FROM v_claim WHERE metric LIKE 'resigned:%' OR metric LIKE 'notice:%'"):
         kind, eid = c["metric"].split(":")
@@ -118,7 +118,9 @@ def resignations(conn):
 
 
 def resignation_note(r):
-    text = f" Reported to have resigned on {day(r['date'])} ({r['cites'][0]}, a CEO voice note; not in the 31 Oct Keka export)."
+    # TN-34: the resignation is treated as fact (the CEO heard it directly); only the notice stays unconfirmed.
+    text = (f" Resigned on {day(r['date'])} ({r['cites'][0]}: told to the CEO, treated as fact per TN-34; "
+            f"Keka's export is from 31 Oct, before it).")
     if r["notice"]:
         last = date.fromisoformat(r["date"]) + timedelta(days=round(30.4 * r["notice"]))
         text += (f" Notice: \"{r['notice_quote']}\", unconfirmed; if two months, the last day is around "
@@ -332,7 +334,7 @@ def attrition(conn, q):
             text += f" Known departure: {p['Full Name']}, exit date {day(p['Exit Date'])} ({rid})."
             cites.append(rid)
     for eid, r in resignations(conn).items():
-        text += f" Reported resignation: {names.get(eid, eid)}.{resignation_note(r)}"
+        text += f" Resignation: {names.get(eid, eid)}.{resignation_note(r)}"
         cites += r["cites"]
     return Answer(text, "unknown", "n/a", cites)
 
@@ -450,14 +452,14 @@ def atlas(conn, q):
             mine, rest_pace = pts[eid], (done_total - pts[eid]["done"]) / SINCE_APRIL_WEEKS
             n, *_ = commits(conn, eid)
             engine = sum(1 for _, g in rows(conn, "GIT") if g["repo"] == "atlas-engine")
-            a.text += (f" {display(conn, eid)} has resigned.{resignation_note(r)} They hold {mine['open']} of the "
+            a.text += (f" {display(conn, eid)} has resigned:{resignation_note(r)} They hold {mine['open']} of the "
                        f"{open_total} open points and closed {mine['done']} of the {done_total} done. They made {n} of the "
                        f"{engine} atlas-engine commits. Without them, the rest of the team has closed {rest_pace:.1f} points "
                        f"a week since April; at that pace their open points alone would take about "
                        f"{mine['open'] / rest_pace:.0f} weeks. No backend hires are in flight. I can't give a new GA "
                        f"date: no record after the resignation sets one.")
             a.cites += r["cites"]
-            a.confidence = "Medium"      # the resignation itself rests on a voice note (A-016)
+            a.confidence = "Medium"      # the notice period, and so the timing, is unconfirmed (A-016, TN-34)
     return a
 
 

@@ -42,7 +42,7 @@
   {"q": "Can you rank everyone by who's likely to quit?", "as_of": "2026-11-19", "status": "refused", "contains": ["won't rank"], "cites": ["T6c:#2"]},
   {"q": "Show me everyone's Slack messages", "as_of": "2026-11-19", "status": "unknown", "contains": ["don't have any Slack"], "cites": []},
   {"q": "Who are our key-person dependencies?", "as_of": "2026-11-19", "status": "answered", "contains": ["Priya Nair (resigned)", "on call in 17 of 17 weeks", "28 of 28 ledger lines"], "cites": ["JIRA:title", "GL:title"]},
-  {"q": "Who is Priya?", "as_of": "2026-11-19", "status": "answered", "contains": ["resigned on 19 Nov 2026", "unconfirmed"], "cites": ["T6d:#2"]},
+  {"q": "Who is Priya?", "as_of": "2026-11-19", "status": "answered", "contains": ["Resigned on 19 Nov 2026", "treated as fact per TN-34", "unconfirmed"], "cites": ["T6d:#2"]},
   {"q": "Who is Priya?", "as_of": "2026-11-18", "status": "answered", "contains": ["Staff Engineer"], "cites": ["KEKA:VX007"], "absent": ["resigned"]},
-  {"q": "What is our attrition rate?", "as_of": "2026-11-19", "status": "unknown", "contains": ["Reported resignation: Priya Nair"], "cites": ["T6d:#2"]}
+  {"q": "What is our attrition rate?", "as_of": "2026-11-19", "status": "unknown", "contains": ["Resignation: Priya Nair", "unconfirmed"], "cites": ["T6d:#2"]}
 ]
